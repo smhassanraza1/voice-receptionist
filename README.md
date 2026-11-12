@@ -19,7 +19,7 @@ An evaluation harness compares the two on latency, cost, interruption handling a
   </picture>
 </p>
 
-**[Read the trade-off analysis →](docs/comparison.md)** · [Architecture](docs/architecture.md)
+**[Read the trade-off analysis →](docs/comparison.md)** · [Architecture](docs/architecture.md) · [Plain-language write-up on Medium](https://medium.com/@smhassanraza1/i-built-one-ai-receptionist-two-ways-then-measured-both-e21aafb09fdd)
 
 ```mermaid
 flowchart LR
