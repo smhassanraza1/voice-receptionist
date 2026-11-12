@@ -1,0 +1,330 @@
+/* Operator console: sign-in, the escalation queue, and joining a call. */
+
+.signin-layout {
+  width: 100%;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: clamp(24px, 6vh, 72px) var(--gutter) 48px;
+  display: grid;
+  place-items: start center;
+}
+
+.signin {
+  width: min(100%, 440px);
+  display: grid;
+  gap: 16px;
+  animation: rise 0.45s ease both;
+}
+
+.signin__icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+.signin .btn {
+  justify-self: start;
+}
+
+.operator-layout {
+  width: 100%;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 12px var(--gutter) 48px;
+  display: grid;
+  grid-template-columns: minmax(280px, 380px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .operator-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* -- queue -------------------------------------------------------------------------------- */
+
+.queue {
+  display: grid;
+  gap: 12px;
+  position: sticky;
+  top: 16px;
+}
+
+@media (max-width: 900px) {
+  .queue {
+    position: static;
+  }
+}
+
+.queue .card__header {
+  margin-bottom: 0;
+}
+
+.queue__list {
+  display: grid;
+  gap: 6px;
+}
+
+.queue-item {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr);
+  gap: 4px 12px;
+  padding: 12px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+  animation: rise 0.35s ease both;
+}
+
+.queue-item:hover:not(:disabled) {
+  background: var(--well);
+}
+
+.queue-item[aria-current='true'] {
+  background: var(--accent-soft);
+  border-color: color-mix(in oklab, var(--accent) 40%, transparent);
+}
+
+.queue-item:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.queue-item__status {
+  grid-row: 1 / span 2;
+  width: 10px;
+  height: 10px;
+  margin-top: 6px;
+  border-radius: 50%;
+}
+
+.queue-item__status--open {
+  background: var(--signal);
+  box-shadow: 0 0 0 3px var(--signal-soft);
+}
+
+.queue-item__status--resolved {
+  background: var(--good);
+}
+
+.queue-item__reason {
+  font-weight: 500;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.queue-item__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  font-size: 0.76rem;
+  color: var(--ink-3);
+}
+
+.queue-item__meta code {
+  font-size: 0.72rem;
+}
+
+.queue__lock {
+  font-size: 0.82rem;
+  color: var(--ink-3);
+}
+
+.queue__resolved summary {
+  padding: 6px 0;
+  font-size: 0.86rem;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.queue__resolved .queue__list {
+  margin-top: 6px;
+}
+
+.feed-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.feed-status__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ink-3);
+}
+
+.feed-status--live .feed-status__dot {
+  background: var(--good);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--good) 20%, transparent);
+}
+
+.feed-status--reconnecting .feed-status__dot,
+.feed-status--connecting .feed-status__dot {
+  background: var(--warn);
+  animation: blink 1.2s ease-in-out infinite;
+}
+
+.feed-status--unauthorized .feed-status__dot,
+.feed-status--disabled .feed-status__dot {
+  background: var(--signal);
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* -- detail ------------------------------------------------------------------------------- */
+
+.detail-placeholder {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  min-height: 260px;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 31px,
+      color-mix(in oklab, var(--line) 55%, transparent) 31px 32px
+    ),
+    var(--surface);
+}
+
+.detail {
+  display: grid;
+  gap: 18px;
+  animation: rise 0.35s ease both;
+}
+
+.detail__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 16px;
+}
+
+.detail__header .display {
+  margin-top: 6px;
+}
+
+.detail__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+  color: var(--ink-3);
+  font-size: 0.82rem;
+}
+
+.detail__summary {
+  display: grid;
+  gap: 8px;
+  padding: 16px 18px;
+  border-radius: var(--radius-md);
+  background: var(--well);
+  border-left: 3px solid var(--accent);
+}
+
+.detail__summary p {
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+.detail__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.detail .transcript {
+  box-shadow: none;
+  background: transparent;
+  padding: 16px 0 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+}
+
+.operator-call {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line);
+  background: color-mix(in oklab, var(--accent-soft) 35%, var(--surface));
+}
+
+.participants {
+  display: grid;
+  gap: 6px;
+}
+
+.participant {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  transition: border-color 0.15s ease;
+}
+
+.participant[data-speaking] {
+  border-color: var(--accent);
+}
+
+.participant__name {
+  font-weight: 500;
+  font-size: 0.92rem;
+}
+
+.participant--agent .participant__name {
+  color: var(--ink-3);
+}
+
+.mini-bars {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 22px;
+}
+
+.mini-bars .lk-audio-bar {
+  width: 4px;
+  min-height: 3px;
+  border-radius: 2px;
+  background: color-mix(in oklab, var(--accent) 30%, transparent);
+  transition: height 0.08s linear;
+}
+
+.participant[data-speaking] .mini-bars .lk-audio-bar {
+  background: var(--accent);
+}
+
+.operator-call .call-controls {
+  justify-content: flex-start;
+}

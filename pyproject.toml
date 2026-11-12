@@ -1,0 +1,59 @@
+[project]
+name = "voice-receptionist"
+version = "0.1.0"
+description = "Voice receptionist for a clinic: LiveKit Agents (speech-to-speech or STT-LLM-TTS), MCP tools with RAG, A2A billing agent, and an evaluation harness."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+dependencies = [
+    "livekit-agents[openai,deepgram,cartesia,elevenlabs,silero,mcp]==1.8.8",
+    "livekit-api>=1.2.2",
+    "mcp==2.3.0",
+    "a2a-sdk[http-server]==1.2.3",
+    "openai>=3.35",
+    "pydantic>=2.14",
+    "pydantic-settings>=2.6",
+    "pyjwt>=2.10",
+    "starlette>=1.9",
+    "uvicorn>=0.54",
+    "httpx>=0.28",
+    "httpx2>=2.16",
+    "pyyaml>=6.0",
+    "python-dotenv>=1.0",
+    "opentelemetry-sdk>=1.45",
+    "opentelemetry-exporter-otlp-proto-http>=1.45",
+    "langsmith[livekit]>=0.14.11",
+    "langfuse>=5.0.4",
+]
+
+[project.optional-dependencies]
+dense = ["fastembed>=0.9"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=1.0",
+    "ruff>=0.8",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/receptionist"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "ASYNC"]
+ignore = ["E501", "B008", "ASYNC109"]

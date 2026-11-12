@@ -1,0 +1,3351 @@
+{
+  "golden_set": {
+    "path": "src/receptionist/mcp_server/rag/golden_set.yaml",
+    "in_scope": 46,
+    "out_of_scope": 10
+  },
+  "method": {
+    "chunking": "by markdown section; sections under 60 words merged, over 150 split (25-word overlap)",
+    "bm25_exact": "Okapi BM25 (k1=1.2, b=0.75) over stemmed content words",
+    "bm25": "bm25_exact plus joined-neighbour and nearest-term (trigram Dice >= 0.6) expansion",
+    "char_ngram": "TF-IDF cosine over 3-5 character n-grams within words",
+    "fusion": "Reciprocal Rank Fusion, k=60, over each ranker's top 20 chunks",
+    "confidence": "length-weighted soft term coverage of the best of the top 3 fused chunks",
+    "metrics": "document-level; recall/MRR ignore the confidence gate, which is scored separately"
+  },
+  "min_confidence": 0.4,
+  "configurations": {
+    "bm25_exact": {
+      "rankers": [
+        "bm25_exact"
+      ],
+      "chunks": 52,
+      "metrics": {
+        "recall@1": 0.804,
+        "recall@3": 0.891,
+        "mrr": 0.841,
+        "out_of_scope_rejection_rate": 0.9,
+        "in_scope_false_rejection_rate": 0.065,
+        "end_to_end_accuracy": 0.893
+      },
+      "recall@3_by_kind": {
+        "asr": 0.571,
+        "direct": 1.0,
+        "paraphrase": 0.909
+      },
+      "queries": [
+        {
+          "query": "What time do you open on Saturday?",
+          "kind": "direct",
+          "relevant": [
+            "hours-location"
+          ],
+          "top_docs": [
+            "hours-location",
+            "appointments",
+            "lab-work"
+          ],
+          "rank": 1,
+          "confidence": 0.7143,
+          "confident": true
+        },
+        {
+          "query": "are you open on sundays",
+          "kind": "paraphrase",
+          "relevant": [
+            "hours-location"
+          ],
+          "top_docs": [
+            "hours-location",
+            "appointments",
+            "urgent-emergency"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "what's the address of the clinic",
+          "kind": "direct",
+          "relevant": [
+            "hours-location",
+            "parking-directions"
+          ],
+          "top_docs": [
+            "hours-location",
+            "parking-directions",
+            "urgent-emergency"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "do you close for thanksgiving",
+          "kind": "paraphrase",
+          "relevant": [
+            "hours-location"
+          ],
+          "top_docs": [
+            "hours-location",
+            "lab-work",
+            "urgent-emergency"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "Is there parking at the building?",
+          "kind": "direct",
+          "relevant": [
+            "parking-directions"
+          ],
+          "top_docs": [
+            "parking-directions",
+            "accessibility",
+            "hours-location"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "which bus goes to your office",
+          "kind": "paraphrase",
+          "relevant": [
+            "parking-directions"
+          ],
+          "top_docs": [
+            "telehealth",
+            "accessibility",
+            "parking-directions"
+          ],
+          "rank": 3,
+          "confidence": 0.4615,
+          "confident": true
+        },
+        {
+          "query": "where do I leave my car",
+          "kind": "paraphrase",
+          "relevant": [
+            "parking-directions"
+          ],
+          "top_docs": [
+            "providers",
+            "pediatrics"
+          ],
+          "rank": null,
+          "confidence": 0.8393,
+          "confident": true
+        },
+        {
+          "query": "Do you take Blue Harbor PPO?",
+          "kind": "asr",
+          "relevant": [
+            "insurance"
+          ],
+          "top_docs": [
+            "insurance",
+            "parking-directions",
+            "accessibility"
+          ],
+          "rank": 1,
+          "confidence": 0.5882,
+          "confident": true
+        },
+        {
+          "query": "is my medicare accepted",
+          "kind": "paraphrase",
+          "relevant": [
+            "insurance"
+          ],
+          "top_docs": [
+            "insurance",
+            "vaccines",
+            "new-patients"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "I don't have insurance, how much is a visit",
+          "kind": "paraphrase",
+          "relevant": [
+            "insurance"
+          ],
+          "top_docs": [
+            "insurance",
+            "telehealth",
+            "medical-records"
+          ],
+          "rank": 1,
+          "confidence": 0.7333,
+          "confident": true
+        },
+        {
+          "query": "what should I bring to my first visit",
+          "kind": "direct",
+          "relevant": [
+            "new-patients"
+          ],
+          "top_docs": [
+            "new-patients",
+            "lab-work",
+            "pediatrics"
+          ],
+          "rank": 1,
+          "confidence": 0.7143,
+          "confident": true
+        },
+        {
+          "query": "I'm a new patient, what paperwork do I need to fill out",
+          "kind": "paraphrase",
+          "relevant": [
+            "new-patients"
+          ],
+          "top_docs": [
+            "new-patients",
+            "appointments",
+            "prescription-refills"
+          ],
+          "rank": 1,
+          "confidence": 0.7273,
+          "confident": true
+        },
+        {
+          "query": "how much is the fee if I cancel late",
+          "kind": "direct",
+          "relevant": [
+            "cancellation-policy"
+          ],
+          "top_docs": [
+            "cancellation-policy",
+            "medical-records",
+            "appointments"
+          ],
+          "rank": 1,
+          "confidence": 0.7647,
+          "confident": true
+        },
+        {
+          "query": "what happens if I miss my appointment",
+          "kind": "paraphrase",
+          "relevant": [
+            "cancellation-policy"
+          ],
+          "top_docs": [
+            "cancellation-policy",
+            "lab-work",
+            "appointments"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "is there a charge to reschedule",
+          "kind": "paraphrase",
+          "relevant": [
+            "cancellation-policy"
+          ],
+          "top_docs": [
+            "cancellation-policy",
+            "appointments"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "I need a refill on my blood pressure medication",
+          "kind": "direct",
+          "relevant": [
+            "prescription-refills"
+          ],
+          "top_docs": [
+            "prescription-refills",
+            "lab-work",
+            "providers"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "presciption refil",
+          "kind": "asr",
+          "relevant": [
+            "prescription-refills"
+          ],
+          "top_docs": [
+            "prescription-refills"
+          ],
+          "rank": 1,
+          "confidence": 0.8814,
+          "confident": true
+        },
+        {
+          "query": "kan i get my perscription filled",
+          "kind": "asr",
+          "relevant": [
+            "prescription-refills"
+          ],
+          "top_docs": [
+            "vaccines",
+            "appointments",
+            "new-patients"
+          ],
+          "rank": null,
+          "confidence": 0.4,
+          "confident": true
+        },
+        {
+          "query": "do I need to fast before my blood test",
+          "kind": "direct",
+          "relevant": [
+            "lab-work"
+          ],
+          "top_docs": [
+            "lab-work",
+            "prescription-refills",
+            "test-results"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "fasting for colesterol test can I drink coffee",
+          "kind": "asr",
+          "relevant": [
+            "lab-work"
+          ],
+          "top_docs": [
+            "lab-work",
+            "test-results",
+            "new-patients"
+          ],
+          "rank": 1,
+          "confidence": 0.9471,
+          "confident": true
+        },
+        {
+          "query": "how long until I get my lab results back",
+          "kind": "paraphrase",
+          "relevant": [
+            "test-results"
+          ],
+          "top_docs": [
+            "test-results",
+            "appointments",
+            "prescription-refills"
+          ],
+          "rank": 1,
+          "confidence": 0.5909,
+          "confident": true
+        },
+        {
+          "query": "the doctor hasn't called about my biopsy",
+          "kind": "paraphrase",
+          "relevant": [
+            "test-results"
+          ],
+          "top_docs": [
+            "test-results",
+            "medical-records",
+            "new-patients"
+          ],
+          "rank": 1,
+          "confidence": 0.6667,
+          "confident": true
+        },
+        {
+          "query": "can I see the doctor over video",
+          "kind": "paraphrase",
+          "relevant": [
+            "telehealth"
+          ],
+          "top_docs": [
+            "billing",
+            "telehealth",
+            "medical-records"
+          ],
+          "rank": 2,
+          "confidence": 0.4259,
+          "confident": true
+        },
+        {
+          "query": "tele health appointment",
+          "kind": "asr",
+          "relevant": [
+            "telehealth"
+          ],
+          "top_docs": [
+            "telehealth",
+            "prescription-refills",
+            "test-results"
+          ],
+          "rank": 1,
+          "confidence": 0.75,
+          "confident": true
+        },
+        {
+          "query": "when can I get a flu shot",
+          "kind": "direct",
+          "relevant": [
+            "vaccines"
+          ],
+          "top_docs": [
+            "vaccines"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "do you do vacines for kids",
+          "kind": "asr",
+          "relevant": [
+            "vaccines",
+            "pediatrics"
+          ],
+          "top_docs": [],
+          "rank": null,
+          "confidence": 0.0,
+          "confident": false
+        },
+        {
+          "query": "does the pediatrician see newborns",
+          "kind": "direct",
+          "relevant": [
+            "pediatrics"
+          ],
+          "top_docs": [
+            "providers",
+            "pediatrics",
+            "insurance"
+          ],
+          "rank": 2,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "my son needs a sports physical form",
+          "kind": "paraphrase",
+          "relevant": [
+            "pediatrics"
+          ],
+          "top_docs": [
+            "pediatrics",
+            "telehealth",
+            "providers"
+          ],
+          "rank": 1,
+          "confidence": 0.6667,
+          "confident": true
+        },
+        {
+          "query": "can I set up a payment plan for my bill",
+          "kind": "direct",
+          "relevant": [
+            "billing"
+          ],
+          "top_docs": [
+            "billing",
+            "insurance",
+            "telehealth"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "can I pay over the phone with my credit card",
+          "kind": "paraphrase",
+          "relevant": [
+            "billing"
+          ],
+          "top_docs": [
+            "billing",
+            "insurance",
+            "test-results"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "how do I get a copy of my medical records",
+          "kind": "direct",
+          "relevant": [
+            "medical-records"
+          ],
+          "top_docs": [
+            "medical-records",
+            "new-patients",
+            "cancellation-policy"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "can my wife call and ask about my health information",
+          "kind": "paraphrase",
+          "relevant": [
+            "medical-records"
+          ],
+          "top_docs": [
+            "medical-records",
+            "interpreters-languages",
+            "urgent-emergency"
+          ],
+          "rank": 1,
+          "confidence": 0.6522,
+          "confident": true
+        },
+        {
+          "query": "I have chest pain what should I do",
+          "kind": "direct",
+          "relevant": [
+            "urgent-emergency"
+          ],
+          "top_docs": [
+            "urgent-emergency",
+            "providers",
+            "medical-records"
+          ],
+          "rank": 1,
+          "confidence": 0.6,
+          "confident": true
+        },
+        {
+          "query": "is there a nurse I can call at night",
+          "kind": "paraphrase",
+          "relevant": [
+            "urgent-emergency"
+          ],
+          "top_docs": [
+            "urgent-emergency",
+            "test-results",
+            "prescription-refills"
+          ],
+          "rank": 1,
+          "confidence": 0.8469,
+          "confident": true
+        },
+        {
+          "query": "I'm having thoughts of hurting myself",
+          "kind": "paraphrase",
+          "relevant": [
+            "urgent-emergency"
+          ],
+          "top_docs": [],
+          "rank": null,
+          "confidence": 0.0,
+          "confident": false
+        },
+        {
+          "query": "do you have a doctor who speaks spanish",
+          "kind": "paraphrase",
+          "relevant": [
+            "interpreters-languages",
+            "providers",
+            "pediatrics"
+          ],
+          "top_docs": [
+            "interpreters-languages",
+            "providers",
+            "pediatrics"
+          ],
+          "rank": 1,
+          "confidence": 0.6667,
+          "confident": true
+        },
+        {
+          "query": "I need a sign language interpreter",
+          "kind": "direct",
+          "relevant": [
+            "interpreters-languages",
+            "accessibility"
+          ],
+          "top_docs": [
+            "interpreters-languages",
+            "appointments",
+            "urgent-emergency"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "is the office wheelchair accessible",
+          "kind": "direct",
+          "relevant": [
+            "accessibility"
+          ],
+          "top_docs": [
+            "accessibility",
+            "telehealth",
+            "parking-directions"
+          ],
+          "rank": 1,
+          "confidence": 0.6667,
+          "confident": true
+        },
+        {
+          "query": "can I bring my service dog",
+          "kind": "paraphrase",
+          "relevant": [
+            "accessibility"
+          ],
+          "top_docs": [
+            "accessibility",
+            "providers",
+            "interpreters-languages"
+          ],
+          "rank": 1,
+          "confidence": 0.8214,
+          "confident": true
+        },
+        {
+          "query": "what does doctor okafor specialize in",
+          "kind": "direct",
+          "relevant": [
+            "providers"
+          ],
+          "top_docs": [
+            "medical-records",
+            "new-patients",
+            "providers"
+          ],
+          "rank": 3,
+          "confidence": 0.5556,
+          "confident": true
+        },
+        {
+          "query": "do you have a skin doctor",
+          "kind": "paraphrase",
+          "relevant": [
+            "providers"
+          ],
+          "top_docs": [
+            "providers",
+            "medical-records",
+            "new-patients"
+          ],
+          "rank": 1,
+          "confidence": 0.6,
+          "confident": true
+        },
+        {
+          "query": "is alex moreau taking new patients",
+          "kind": "direct",
+          "relevant": [
+            "providers",
+            "new-patients"
+          ],
+          "top_docs": [
+            "providers",
+            "new-patients",
+            "interpreters-languages"
+          ],
+          "rank": 1,
+          "confidence": 0.76,
+          "confident": true
+        },
+        {
+          "query": "how far in advance can I book an appointment",
+          "kind": "direct",
+          "relevant": [
+            "appointments"
+          ],
+          "top_docs": [
+            "appointments",
+            "cancellation-policy",
+            "telehealth"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "how early should I arrive",
+          "kind": "paraphrase",
+          "relevant": [
+            "appointments",
+            "new-patients"
+          ],
+          "top_docs": [
+            "appointments",
+            "new-patients",
+            "medical-records"
+          ],
+          "rank": 1,
+          "confidence": 0.6471,
+          "confident": true
+        },
+        {
+          "query": "wat ar yur ours on saterday",
+          "kind": "asr",
+          "relevant": [
+            "hours-location"
+          ],
+          "top_docs": [],
+          "rank": null,
+          "confidence": 0.0,
+          "confident": false
+        },
+        {
+          "query": "I want to pay my balance online",
+          "kind": "paraphrase",
+          "relevant": [
+            "billing"
+          ],
+          "top_docs": [
+            "billing",
+            "insurance",
+            "appointments"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "what's the weather going to be like tomorrow",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "cancellation-policy"
+          ],
+          "rank": null,
+          "confidence": 0.3529,
+          "confident": false
+        },
+        {
+          "query": "who won the football game last night",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [],
+          "rank": null,
+          "confidence": 0.0,
+          "confident": false
+        },
+        {
+          "query": "can you recommend a good italian restaurant",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "vaccines",
+            "telehealth",
+            "test-results"
+          ],
+          "rank": null,
+          "confidence": 0.2727,
+          "confident": false
+        },
+        {
+          "query": "how do I reset my email password",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "billing",
+            "test-results",
+            "telehealth"
+          ],
+          "rank": null,
+          "confidence": 0.3125,
+          "confident": false
+        },
+        {
+          "query": "what is the capital of france",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [],
+          "rank": null,
+          "confidence": 0.0,
+          "confident": false
+        },
+        {
+          "query": "tell me a joke",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [],
+          "rank": null,
+          "confidence": 0.0,
+          "confident": false
+        },
+        {
+          "query": "what's the stock price of apple",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [],
+          "rank": null,
+          "confidence": 0.0,
+          "confident": false
+        },
+        {
+          "query": "book me a flight to chicago",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "appointments",
+            "telehealth",
+            "cancellation-policy"
+          ],
+          "rank": null,
+          "confidence": 0.25,
+          "confident": false
+        },
+        {
+          "query": "how do I cook brown rice",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [],
+          "rank": null,
+          "confidence": 0.0,
+          "confident": false
+        },
+        {
+          "query": "do you sell car insurance",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "providers",
+            "insurance",
+            "vaccines"
+          ],
+          "rank": null,
+          "confidence": 0.7473,
+          "confident": true
+        }
+      ]
+    },
+    "bm25": {
+      "rankers": [
+        "bm25"
+      ],
+      "chunks": 52,
+      "metrics": {
+        "recall@1": 0.87,
+        "recall@3": 0.957,
+        "mrr": 0.906,
+        "out_of_scope_rejection_rate": 0.9,
+        "in_scope_false_rejection_rate": 0.043,
+        "end_to_end_accuracy": 0.929
+      },
+      "recall@3_by_kind": {
+        "asr": 1.0,
+        "direct": 1.0,
+        "paraphrase": 0.909
+      },
+      "queries": [
+        {
+          "query": "What time do you open on Saturday?",
+          "kind": "direct",
+          "relevant": [
+            "hours-location"
+          ],
+          "top_docs": [
+            "hours-location",
+            "appointments",
+            "lab-work"
+          ],
+          "rank": 1,
+          "confidence": 0.7143,
+          "confident": true
+        },
+        {
+          "query": "are you open on sundays",
+          "kind": "paraphrase",
+          "relevant": [
+            "hours-location"
+          ],
+          "top_docs": [
+            "hours-location",
+            "appointments",
+            "urgent-emergency"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "what's the address of the clinic",
+          "kind": "direct",
+          "relevant": [
+            "hours-location",
+            "parking-directions"
+          ],
+          "top_docs": [
+            "hours-location",
+            "parking-directions",
+            "urgent-emergency"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "do you close for thanksgiving",
+          "kind": "paraphrase",
+          "relevant": [
+            "hours-location"
+          ],
+          "top_docs": [
+            "hours-location",
+            "lab-work",
+            "urgent-emergency"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "Is there parking at the building?",
+          "kind": "direct",
+          "relevant": [
+            "parking-directions"
+          ],
+          "top_docs": [
+            "parking-directions",
+            "accessibility",
+            "hours-location"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "which bus goes to your office",
+          "kind": "paraphrase",
+          "relevant": [
+            "parking-directions"
+          ],
+          "top_docs": [
+            "telehealth",
+            "accessibility",
+            "parking-directions"
+          ],
+          "rank": 3,
+          "confidence": 0.4615,
+          "confident": true
+        },
+        {
+          "query": "where do I leave my car",
+          "kind": "paraphrase",
+          "relevant": [
+            "parking-directions"
+          ],
+          "top_docs": [
+            "providers",
+            "pediatrics"
+          ],
+          "rank": null,
+          "confidence": 0.8393,
+          "confident": true
+        },
+        {
+          "query": "Do you take Blue Harbor PPO?",
+          "kind": "asr",
+          "relevant": [
+            "insurance"
+          ],
+          "top_docs": [
+            "insurance",
+            "parking-directions",
+            "accessibility"
+          ],
+          "rank": 1,
+          "confidence": 0.5882,
+          "confident": true
+        },
+        {
+          "query": "is my medicare accepted",
+          "kind": "paraphrase",
+          "relevant": [
+            "insurance"
+          ],
+          "top_docs": [
+            "insurance",
+            "vaccines",
+            "new-patients"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "I don't have insurance, how much is a visit",
+          "kind": "paraphrase",
+          "relevant": [
+            "insurance"
+          ],
+          "top_docs": [
+            "insurance",
+            "telehealth",
+            "medical-records"
+          ],
+          "rank": 1,
+          "confidence": 0.7333,
+          "confident": true
+        },
+        {
+          "query": "what should I bring to my first visit",
+          "kind": "direct",
+          "relevant": [
+            "new-patients"
+          ],
+          "top_docs": [
+            "new-patients",
+            "lab-work",
+            "pediatrics"
+          ],
+          "rank": 1,
+          "confidence": 0.7143,
+          "confident": true
+        },
+        {
+          "query": "I'm a new patient, what paperwork do I need to fill out",
+          "kind": "paraphrase",
+          "relevant": [
+            "new-patients"
+          ],
+          "top_docs": [
+            "new-patients",
+            "appointments",
+            "prescription-refills"
+          ],
+          "rank": 1,
+          "confidence": 0.7273,
+          "confident": true
+        },
+        {
+          "query": "how much is the fee if I cancel late",
+          "kind": "direct",
+          "relevant": [
+            "cancellation-policy"
+          ],
+          "top_docs": [
+            "cancellation-policy",
+            "medical-records",
+            "appointments"
+          ],
+          "rank": 1,
+          "confidence": 0.7647,
+          "confident": true
+        },
+        {
+          "query": "what happens if I miss my appointment",
+          "kind": "paraphrase",
+          "relevant": [
+            "cancellation-policy"
+          ],
+          "top_docs": [
+            "cancellation-policy",
+            "lab-work",
+            "appointments"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "is there a charge to reschedule",
+          "kind": "paraphrase",
+          "relevant": [
+            "cancellation-policy"
+          ],
+          "top_docs": [
+            "cancellation-policy",
+            "appointments"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "I need a refill on my blood pressure medication",
+          "kind": "direct",
+          "relevant": [
+            "prescription-refills"
+          ],
+          "top_docs": [
+            "prescription-refills",
+            "lab-work",
+            "providers"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "presciption refil",
+          "kind": "asr",
+          "relevant": [
+            "prescription-refills"
+          ],
+          "top_docs": [
+            "prescription-refills"
+          ],
+          "rank": 1,
+          "confidence": 0.8814,
+          "confident": true
+        },
+        {
+          "query": "kan i get my perscription filled",
+          "kind": "asr",
+          "relevant": [
+            "prescription-refills"
+          ],
+          "top_docs": [
+            "prescription-refills",
+            "vaccines",
+            "appointments"
+          ],
+          "rank": 1,
+          "confidence": 0.4,
+          "confident": true
+        },
+        {
+          "query": "do I need to fast before my blood test",
+          "kind": "direct",
+          "relevant": [
+            "lab-work"
+          ],
+          "top_docs": [
+            "lab-work",
+            "prescription-refills",
+            "test-results"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "fasting for colesterol test can I drink coffee",
+          "kind": "asr",
+          "relevant": [
+            "lab-work"
+          ],
+          "top_docs": [
+            "lab-work",
+            "test-results",
+            "new-patients"
+          ],
+          "rank": 1,
+          "confidence": 0.9471,
+          "confident": true
+        },
+        {
+          "query": "how long until I get my lab results back",
+          "kind": "paraphrase",
+          "relevant": [
+            "test-results"
+          ],
+          "top_docs": [
+            "test-results",
+            "appointments",
+            "prescription-refills"
+          ],
+          "rank": 1,
+          "confidence": 0.5909,
+          "confident": true
+        },
+        {
+          "query": "the doctor hasn't called about my biopsy",
+          "kind": "paraphrase",
+          "relevant": [
+            "test-results"
+          ],
+          "top_docs": [
+            "test-results",
+            "medical-records",
+            "new-patients"
+          ],
+          "rank": 1,
+          "confidence": 0.6667,
+          "confident": true
+        },
+        {
+          "query": "can I see the doctor over video",
+          "kind": "paraphrase",
+          "relevant": [
+            "telehealth"
+          ],
+          "top_docs": [
+            "billing",
+            "telehealth",
+            "medical-records"
+          ],
+          "rank": 2,
+          "confidence": 0.4259,
+          "confident": true
+        },
+        {
+          "query": "tele health appointment",
+          "kind": "asr",
+          "relevant": [
+            "telehealth"
+          ],
+          "top_docs": [
+            "telehealth",
+            "prescription-refills",
+            "test-results"
+          ],
+          "rank": 1,
+          "confidence": 0.75,
+          "confident": true
+        },
+        {
+          "query": "when can I get a flu shot",
+          "kind": "direct",
+          "relevant": [
+            "vaccines"
+          ],
+          "top_docs": [
+            "vaccines"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "do you do vacines for kids",
+          "kind": "asr",
+          "relevant": [
+            "vaccines",
+            "pediatrics"
+          ],
+          "top_docs": [
+            "vaccines",
+            "new-patients",
+            "insurance"
+          ],
+          "rank": 1,
+          "confidence": 0.48,
+          "confident": true
+        },
+        {
+          "query": "does the pediatrician see newborns",
+          "kind": "direct",
+          "relevant": [
+            "pediatrics"
+          ],
+          "top_docs": [
+            "providers",
+            "pediatrics",
+            "insurance"
+          ],
+          "rank": 2,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "my son needs a sports physical form",
+          "kind": "paraphrase",
+          "relevant": [
+            "pediatrics"
+          ],
+          "top_docs": [
+            "pediatrics",
+            "telehealth",
+            "providers"
+          ],
+          "rank": 1,
+          "confidence": 0.6667,
+          "confident": true
+        },
+        {
+          "query": "can I set up a payment plan for my bill",
+          "kind": "direct",
+          "relevant": [
+            "billing"
+          ],
+          "top_docs": [
+            "billing",
+            "insurance",
+            "telehealth"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "can I pay over the phone with my credit card",
+          "kind": "paraphrase",
+          "relevant": [
+            "billing"
+          ],
+          "top_docs": [
+            "billing",
+            "insurance",
+            "test-results"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "how do I get a copy of my medical records",
+          "kind": "direct",
+          "relevant": [
+            "medical-records"
+          ],
+          "top_docs": [
+            "medical-records",
+            "new-patients",
+            "cancellation-policy"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "can my wife call and ask about my health information",
+          "kind": "paraphrase",
+          "relevant": [
+            "medical-records"
+          ],
+          "top_docs": [
+            "medical-records",
+            "interpreters-languages",
+            "urgent-emergency"
+          ],
+          "rank": 1,
+          "confidence": 0.6522,
+          "confident": true
+        },
+        {
+          "query": "I have chest pain what should I do",
+          "kind": "direct",
+          "relevant": [
+            "urgent-emergency"
+          ],
+          "top_docs": [
+            "urgent-emergency",
+            "providers",
+            "medical-records"
+          ],
+          "rank": 1,
+          "confidence": 0.6,
+          "confident": true
+        },
+        {
+          "query": "is there a nurse I can call at night",
+          "kind": "paraphrase",
+          "relevant": [
+            "urgent-emergency"
+          ],
+          "top_docs": [
+            "urgent-emergency",
+            "test-results",
+            "prescription-refills"
+          ],
+          "rank": 1,
+          "confidence": 0.8571,
+          "confident": true
+        },
+        {
+          "query": "I'm having thoughts of hurting myself",
+          "kind": "paraphrase",
+          "relevant": [
+            "urgent-emergency"
+          ],
+          "top_docs": [
+            "insurance"
+          ],
+          "rank": null,
+          "confidence": 0.2,
+          "confident": false
+        },
+        {
+          "query": "do you have a doctor who speaks spanish",
+          "kind": "paraphrase",
+          "relevant": [
+            "interpreters-languages",
+            "providers",
+            "pediatrics"
+          ],
+          "top_docs": [
+            "interpreters-languages",
+            "providers",
+            "pediatrics"
+          ],
+          "rank": 1,
+          "confidence": 0.6667,
+          "confident": true
+        },
+        {
+          "query": "I need a sign language interpreter",
+          "kind": "direct",
+          "relevant": [
+            "interpreters-languages",
+            "accessibility"
+          ],
+          "top_docs": [
+            "interpreters-languages",
+            "appointments",
+            "urgent-emergency"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "is the office wheelchair accessible",
+          "kind": "direct",
+          "relevant": [
+            "accessibility"
+          ],
+          "top_docs": [
+            "accessibility",
+            "telehealth",
+            "parking-directions"
+          ],
+          "rank": 1,
+          "confidence": 0.6667,
+          "confident": true
+        },
+        {
+          "query": "can I bring my service dog",
+          "kind": "paraphrase",
+          "relevant": [
+            "accessibility"
+          ],
+          "top_docs": [
+            "accessibility",
+            "providers",
+            "interpreters-languages"
+          ],
+          "rank": 1,
+          "confidence": 0.8214,
+          "confident": true
+        },
+        {
+          "query": "what does doctor okafor specialize in",
+          "kind": "direct",
+          "relevant": [
+            "providers"
+          ],
+          "top_docs": [
+            "new-patients",
+            "medical-records",
+            "providers"
+          ],
+          "rank": 3,
+          "confidence": 0.5556,
+          "confident": true
+        },
+        {
+          "query": "do you have a skin doctor",
+          "kind": "paraphrase",
+          "relevant": [
+            "providers"
+          ],
+          "top_docs": [
+            "providers",
+            "medical-records",
+            "new-patients"
+          ],
+          "rank": 1,
+          "confidence": 0.6,
+          "confident": true
+        },
+        {
+          "query": "is alex moreau taking new patients",
+          "kind": "direct",
+          "relevant": [
+            "providers",
+            "new-patients"
+          ],
+          "top_docs": [
+            "providers",
+            "new-patients",
+            "interpreters-languages"
+          ],
+          "rank": 1,
+          "confidence": 0.76,
+          "confident": true
+        },
+        {
+          "query": "how far in advance can I book an appointment",
+          "kind": "direct",
+          "relevant": [
+            "appointments"
+          ],
+          "top_docs": [
+            "appointments",
+            "cancellation-policy",
+            "telehealth"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "how early should I arrive",
+          "kind": "paraphrase",
+          "relevant": [
+            "appointments",
+            "new-patients"
+          ],
+          "top_docs": [
+            "appointments",
+            "new-patients",
+            "medical-records"
+          ],
+          "rank": 1,
+          "confidence": 0.6471,
+          "confident": true
+        },
+        {
+          "query": "wat ar yur ours on saterday",
+          "kind": "asr",
+          "relevant": [
+            "hours-location"
+          ],
+          "top_docs": [
+            "hours-location",
+            "lab-work",
+            "providers"
+          ],
+          "rank": 1,
+          "confidence": 0.3565,
+          "confident": false
+        },
+        {
+          "query": "I want to pay my balance online",
+          "kind": "paraphrase",
+          "relevant": [
+            "billing"
+          ],
+          "top_docs": [
+            "billing",
+            "insurance",
+            "appointments"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "what's the weather going to be like tomorrow",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "cancellation-policy"
+          ],
+          "rank": null,
+          "confidence": 0.3529,
+          "confident": false
+        },
+        {
+          "query": "who won the football game last night",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "parking-directions",
+            "urgent-emergency"
+          ],
+          "rank": null,
+          "confidence": 0.2273,
+          "confident": false
+        },
+        {
+          "query": "can you recommend a good italian restaurant",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "vaccines",
+            "telehealth",
+            "test-results"
+          ],
+          "rank": null,
+          "confidence": 0.2727,
+          "confident": false
+        },
+        {
+          "query": "how do I reset my email password",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "billing",
+            "test-results",
+            "telehealth"
+          ],
+          "rank": null,
+          "confidence": 0.3125,
+          "confident": false
+        },
+        {
+          "query": "what is the capital of france",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [],
+          "rank": null,
+          "confidence": 0.0,
+          "confident": false
+        },
+        {
+          "query": "tell me a joke",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [],
+          "rank": null,
+          "confidence": 0.0,
+          "confident": false
+        },
+        {
+          "query": "what's the stock price of apple",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "telehealth",
+            "cancellation-policy"
+          ],
+          "rank": null,
+          "confidence": 0.1667,
+          "confident": false
+        },
+        {
+          "query": "book me a flight to chicago",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "appointments",
+            "parking-directions",
+            "telehealth"
+          ],
+          "rank": null,
+          "confidence": 0.2727,
+          "confident": false
+        },
+        {
+          "query": "how do I cook brown rice",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [],
+          "rank": null,
+          "confidence": 0.0,
+          "confident": false
+        },
+        {
+          "query": "do you sell car insurance",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "providers",
+            "insurance",
+            "vaccines"
+          ],
+          "rank": null,
+          "confidence": 0.7473,
+          "confident": true
+        }
+      ]
+    },
+    "char_ngram": {
+      "rankers": [
+        "char_ngram"
+      ],
+      "chunks": 52,
+      "metrics": {
+        "recall@1": 0.826,
+        "recall@3": 0.957,
+        "mrr": 0.889,
+        "out_of_scope_rejection_rate": 0.9,
+        "in_scope_false_rejection_rate": 0.065,
+        "end_to_end_accuracy": 0.893
+      },
+      "recall@3_by_kind": {
+        "asr": 1.0,
+        "direct": 1.0,
+        "paraphrase": 0.909
+      },
+      "queries": [
+        {
+          "query": "What time do you open on Saturday?",
+          "kind": "direct",
+          "relevant": [
+            "hours-location"
+          ],
+          "top_docs": [
+            "hours-location",
+            "lab-work",
+            "appointments"
+          ],
+          "rank": 1,
+          "confidence": 0.7143,
+          "confident": true
+        },
+        {
+          "query": "are you open on sundays",
+          "kind": "paraphrase",
+          "relevant": [
+            "hours-location"
+          ],
+          "top_docs": [
+            "hours-location",
+            "appointments",
+            "urgent-emergency"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "what's the address of the clinic",
+          "kind": "direct",
+          "relevant": [
+            "hours-location",
+            "parking-directions"
+          ],
+          "top_docs": [
+            "hours-location",
+            "urgent-emergency",
+            "parking-directions"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "do you close for thanksgiving",
+          "kind": "paraphrase",
+          "relevant": [
+            "hours-location"
+          ],
+          "top_docs": [
+            "hours-location",
+            "lab-work",
+            "urgent-emergency"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "Is there parking at the building?",
+          "kind": "direct",
+          "relevant": [
+            "parking-directions"
+          ],
+          "top_docs": [
+            "parking-directions",
+            "accessibility",
+            "hours-location"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "which bus goes to your office",
+          "kind": "paraphrase",
+          "relevant": [
+            "parking-directions"
+          ],
+          "top_docs": [
+            "telehealth",
+            "insurance",
+            "accessibility"
+          ],
+          "rank": 4,
+          "confidence": 0.4615,
+          "confident": true
+        },
+        {
+          "query": "where do I leave my car",
+          "kind": "paraphrase",
+          "relevant": [
+            "parking-directions"
+          ],
+          "top_docs": [
+            "pediatrics",
+            "vaccines",
+            "cancellation-policy"
+          ],
+          "rank": null,
+          "confidence": 0.8393,
+          "confident": true
+        },
+        {
+          "query": "Do you take Blue Harbor PPO?",
+          "kind": "asr",
+          "relevant": [
+            "insurance"
+          ],
+          "top_docs": [
+            "parking-directions",
+            "insurance",
+            "hours-location"
+          ],
+          "rank": 2,
+          "confidence": 0.5882,
+          "confident": true
+        },
+        {
+          "query": "is my medicare accepted",
+          "kind": "paraphrase",
+          "relevant": [
+            "insurance"
+          ],
+          "top_docs": [
+            "insurance",
+            "providers",
+            "new-patients"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "I don't have insurance, how much is a visit",
+          "kind": "paraphrase",
+          "relevant": [
+            "insurance"
+          ],
+          "top_docs": [
+            "insurance",
+            "telehealth",
+            "vaccines"
+          ],
+          "rank": 1,
+          "confidence": 0.7333,
+          "confident": true
+        },
+        {
+          "query": "what should I bring to my first visit",
+          "kind": "direct",
+          "relevant": [
+            "new-patients"
+          ],
+          "top_docs": [
+            "new-patients",
+            "medical-records",
+            "lab-work"
+          ],
+          "rank": 1,
+          "confidence": 0.7143,
+          "confident": true
+        },
+        {
+          "query": "I'm a new patient, what paperwork do I need to fill out",
+          "kind": "paraphrase",
+          "relevant": [
+            "new-patients"
+          ],
+          "top_docs": [
+            "new-patients",
+            "insurance",
+            "prescription-refills"
+          ],
+          "rank": 1,
+          "confidence": 0.7273,
+          "confident": true
+        },
+        {
+          "query": "how much is the fee if I cancel late",
+          "kind": "direct",
+          "relevant": [
+            "cancellation-policy"
+          ],
+          "top_docs": [
+            "cancellation-policy",
+            "appointments",
+            "medical-records"
+          ],
+          "rank": 1,
+          "confidence": 0.7647,
+          "confident": true
+        },
+        {
+          "query": "what happens if I miss my appointment",
+          "kind": "paraphrase",
+          "relevant": [
+            "cancellation-policy"
+          ],
+          "top_docs": [
+            "cancellation-policy",
+            "appointments",
+            "vaccines"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "is there a charge to reschedule",
+          "kind": "paraphrase",
+          "relevant": [
+            "cancellation-policy"
+          ],
+          "top_docs": [
+            "cancellation-policy",
+            "appointments",
+            "prescription-refills"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "I need a refill on my blood pressure medication",
+          "kind": "direct",
+          "relevant": [
+            "prescription-refills"
+          ],
+          "top_docs": [
+            "prescription-refills",
+            "providers",
+            "lab-work"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "presciption refil",
+          "kind": "asr",
+          "relevant": [
+            "prescription-refills"
+          ],
+          "top_docs": [
+            "prescription-refills",
+            "cancellation-policy",
+            "appointments"
+          ],
+          "rank": 1,
+          "confidence": 0.8814,
+          "confident": true
+        },
+        {
+          "query": "kan i get my perscription filled",
+          "kind": "asr",
+          "relevant": [
+            "prescription-refills"
+          ],
+          "top_docs": [
+            "prescription-refills",
+            "appointments",
+            "telehealth"
+          ],
+          "rank": 1,
+          "confidence": 0.5524,
+          "confident": true
+        },
+        {
+          "query": "do I need to fast before my blood test",
+          "kind": "direct",
+          "relevant": [
+            "lab-work"
+          ],
+          "top_docs": [
+            "lab-work",
+            "prescription-refills",
+            "test-results"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "fasting for colesterol test can I drink coffee",
+          "kind": "asr",
+          "relevant": [
+            "lab-work"
+          ],
+          "top_docs": [
+            "lab-work",
+            "test-results",
+            "prescription-refills"
+          ],
+          "rank": 1,
+          "confidence": 0.9471,
+          "confident": true
+        },
+        {
+          "query": "how long until I get my lab results back",
+          "kind": "paraphrase",
+          "relevant": [
+            "test-results"
+          ],
+          "top_docs": [
+            "test-results",
+            "appointments",
+            "lab-work"
+          ],
+          "rank": 1,
+          "confidence": 0.5909,
+          "confident": true
+        },
+        {
+          "query": "the doctor hasn't called about my biopsy",
+          "kind": "paraphrase",
+          "relevant": [
+            "test-results"
+          ],
+          "top_docs": [
+            "new-patients",
+            "medical-records",
+            "test-results"
+          ],
+          "rank": 3,
+          "confidence": 0.3333,
+          "confident": false
+        },
+        {
+          "query": "can I see the doctor over video",
+          "kind": "paraphrase",
+          "relevant": [
+            "telehealth"
+          ],
+          "top_docs": [
+            "telehealth",
+            "new-patients",
+            "medical-records"
+          ],
+          "rank": 1,
+          "confidence": 0.4259,
+          "confident": true
+        },
+        {
+          "query": "tele health appointment",
+          "kind": "asr",
+          "relevant": [
+            "telehealth"
+          ],
+          "top_docs": [
+            "telehealth",
+            "appointments",
+            "prescription-refills"
+          ],
+          "rank": 1,
+          "confidence": 0.75,
+          "confident": true
+        },
+        {
+          "query": "when can I get a flu shot",
+          "kind": "direct",
+          "relevant": [
+            "vaccines"
+          ],
+          "top_docs": [
+            "vaccines",
+            "cancellation-policy",
+            "lab-work"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "do you do vacines for kids",
+          "kind": "asr",
+          "relevant": [
+            "vaccines",
+            "pediatrics"
+          ],
+          "top_docs": [
+            "vaccines",
+            "providers",
+            "prescription-refills"
+          ],
+          "rank": 1,
+          "confidence": 0.48,
+          "confident": true
+        },
+        {
+          "query": "does the pediatrician see newborns",
+          "kind": "direct",
+          "relevant": [
+            "pediatrics"
+          ],
+          "top_docs": [
+            "pediatrics",
+            "providers",
+            "hours-location"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "my son needs a sports physical form",
+          "kind": "paraphrase",
+          "relevant": [
+            "pediatrics"
+          ],
+          "top_docs": [
+            "pediatrics",
+            "telehealth",
+            "providers"
+          ],
+          "rank": 1,
+          "confidence": 0.6667,
+          "confident": true
+        },
+        {
+          "query": "can I set up a payment plan for my bill",
+          "kind": "direct",
+          "relevant": [
+            "billing"
+          ],
+          "top_docs": [
+            "billing",
+            "insurance",
+            "telehealth"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "can I pay over the phone with my credit card",
+          "kind": "paraphrase",
+          "relevant": [
+            "billing"
+          ],
+          "top_docs": [
+            "billing",
+            "insurance",
+            "test-results"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "how do I get a copy of my medical records",
+          "kind": "direct",
+          "relevant": [
+            "medical-records"
+          ],
+          "top_docs": [
+            "medical-records",
+            "new-patients",
+            "providers"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "can my wife call and ask about my health information",
+          "kind": "paraphrase",
+          "relevant": [
+            "medical-records"
+          ],
+          "top_docs": [
+            "medical-records",
+            "telehealth",
+            "urgent-emergency"
+          ],
+          "rank": 1,
+          "confidence": 0.6522,
+          "confident": true
+        },
+        {
+          "query": "I have chest pain what should I do",
+          "kind": "direct",
+          "relevant": [
+            "urgent-emergency"
+          ],
+          "top_docs": [
+            "medical-records",
+            "urgent-emergency",
+            "providers"
+          ],
+          "rank": 2,
+          "confidence": 0.6,
+          "confident": true
+        },
+        {
+          "query": "is there a nurse I can call at night",
+          "kind": "paraphrase",
+          "relevant": [
+            "urgent-emergency"
+          ],
+          "top_docs": [
+            "urgent-emergency",
+            "test-results",
+            "prescription-refills"
+          ],
+          "rank": 1,
+          "confidence": 0.8571,
+          "confident": true
+        },
+        {
+          "query": "I'm having thoughts of hurting myself",
+          "kind": "paraphrase",
+          "relevant": [
+            "urgent-emergency"
+          ],
+          "top_docs": [
+            "insurance",
+            "urgent-emergency",
+            "test-results"
+          ],
+          "rank": 2,
+          "confidence": 0.2,
+          "confident": false
+        },
+        {
+          "query": "do you have a doctor who speaks spanish",
+          "kind": "paraphrase",
+          "relevant": [
+            "interpreters-languages",
+            "providers",
+            "pediatrics"
+          ],
+          "top_docs": [
+            "providers",
+            "interpreters-languages",
+            "pediatrics"
+          ],
+          "rank": 1,
+          "confidence": 0.6667,
+          "confident": true
+        },
+        {
+          "query": "I need a sign language interpreter",
+          "kind": "direct",
+          "relevant": [
+            "interpreters-languages",
+            "accessibility"
+          ],
+          "top_docs": [
+            "interpreters-languages",
+            "appointments",
+            "accessibility"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "is the office wheelchair accessible",
+          "kind": "direct",
+          "relevant": [
+            "accessibility"
+          ],
+          "top_docs": [
+            "accessibility",
+            "telehealth",
+            "parking-directions"
+          ],
+          "rank": 1,
+          "confidence": 0.6667,
+          "confident": true
+        },
+        {
+          "query": "can I bring my service dog",
+          "kind": "paraphrase",
+          "relevant": [
+            "accessibility"
+          ],
+          "top_docs": [
+            "accessibility",
+            "providers",
+            "interpreters-languages"
+          ],
+          "rank": 1,
+          "confidence": 0.8214,
+          "confident": true
+        },
+        {
+          "query": "what does doctor okafor specialize in",
+          "kind": "direct",
+          "relevant": [
+            "providers"
+          ],
+          "top_docs": [
+            "new-patients",
+            "providers",
+            "hours-location"
+          ],
+          "rank": 2,
+          "confidence": 0.5556,
+          "confident": true
+        },
+        {
+          "query": "do you have a skin doctor",
+          "kind": "paraphrase",
+          "relevant": [
+            "providers"
+          ],
+          "top_docs": [
+            "new-patients",
+            "medical-records",
+            "providers"
+          ],
+          "rank": 3,
+          "confidence": 0.6,
+          "confident": true
+        },
+        {
+          "query": "is alex moreau taking new patients",
+          "kind": "direct",
+          "relevant": [
+            "providers",
+            "new-patients"
+          ],
+          "top_docs": [
+            "new-patients",
+            "providers",
+            "interpreters-languages"
+          ],
+          "rank": 1,
+          "confidence": 0.76,
+          "confident": true
+        },
+        {
+          "query": "how far in advance can I book an appointment",
+          "kind": "direct",
+          "relevant": [
+            "appointments"
+          ],
+          "top_docs": [
+            "appointments",
+            "cancellation-policy",
+            "telehealth"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "how early should I arrive",
+          "kind": "paraphrase",
+          "relevant": [
+            "appointments",
+            "new-patients"
+          ],
+          "top_docs": [
+            "appointments",
+            "medical-records",
+            "new-patients"
+          ],
+          "rank": 1,
+          "confidence": 0.6471,
+          "confident": true
+        },
+        {
+          "query": "wat ar yur ours on saterday",
+          "kind": "asr",
+          "relevant": [
+            "hours-location"
+          ],
+          "top_docs": [
+            "hours-location",
+            "lab-work",
+            "urgent-emergency"
+          ],
+          "rank": 1,
+          "confidence": 0.3565,
+          "confident": false
+        },
+        {
+          "query": "I want to pay my balance online",
+          "kind": "paraphrase",
+          "relevant": [
+            "billing"
+          ],
+          "top_docs": [
+            "billing",
+            "insurance",
+            "appointments"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "what's the weather going to be like tomorrow",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "cancellation-policy",
+            "accessibility",
+            "pediatrics"
+          ],
+          "rank": null,
+          "confidence": 0.3529,
+          "confident": false
+        },
+        {
+          "query": "who won the football game last night",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "parking-directions",
+            "urgent-emergency",
+            "lab-work"
+          ],
+          "rank": null,
+          "confidence": 0.2273,
+          "confident": false
+        },
+        {
+          "query": "can you recommend a good italian restaurant",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "vaccines",
+            "test-results",
+            "medical-records"
+          ],
+          "rank": null,
+          "confidence": 0.2727,
+          "confident": false
+        },
+        {
+          "query": "how do I reset my email password",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "billing",
+            "test-results",
+            "telehealth"
+          ],
+          "rank": null,
+          "confidence": 0.3125,
+          "confident": false
+        },
+        {
+          "query": "what is the capital of france",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "medical-records",
+            "insurance",
+            "pediatrics"
+          ],
+          "rank": null,
+          "confidence": 0.2667,
+          "confident": false
+        },
+        {
+          "query": "tell me a joke",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "urgent-emergency",
+            "appointments",
+            "telehealth"
+          ],
+          "rank": null,
+          "confidence": 0.0,
+          "confident": false
+        },
+        {
+          "query": "what's the stock price of apple",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "telehealth",
+            "parking-directions",
+            "insurance"
+          ],
+          "rank": null,
+          "confidence": 0.1667,
+          "confident": false
+        },
+        {
+          "query": "book me a flight to chicago",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "parking-directions",
+            "appointments",
+            "telehealth"
+          ],
+          "rank": null,
+          "confidence": 0.2727,
+          "confident": false
+        },
+        {
+          "query": "how do I cook brown rice",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "appointments",
+            "pediatrics",
+            "accessibility"
+          ],
+          "rank": null,
+          "confidence": 0.1538,
+          "confident": false
+        },
+        {
+          "query": "do you sell car insurance",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "insurance",
+            "vaccines",
+            "new-patients"
+          ],
+          "rank": null,
+          "confidence": 0.7473,
+          "confident": true
+        }
+      ]
+    },
+    "fused": {
+      "rankers": [
+        "bm25",
+        "char_ngram"
+      ],
+      "chunks": 52,
+      "metrics": {
+        "recall@1": 0.87,
+        "recall@3": 0.957,
+        "mrr": 0.911,
+        "out_of_scope_rejection_rate": 0.9,
+        "in_scope_false_rejection_rate": 0.043,
+        "end_to_end_accuracy": 0.911
+      },
+      "recall@3_by_kind": {
+        "asr": 1.0,
+        "direct": 1.0,
+        "paraphrase": 0.909
+      },
+      "queries": [
+        {
+          "query": "What time do you open on Saturday?",
+          "kind": "direct",
+          "relevant": [
+            "hours-location"
+          ],
+          "top_docs": [
+            "hours-location",
+            "appointments",
+            "lab-work"
+          ],
+          "rank": 1,
+          "confidence": 0.7143,
+          "confident": true
+        },
+        {
+          "query": "are you open on sundays",
+          "kind": "paraphrase",
+          "relevant": [
+            "hours-location"
+          ],
+          "top_docs": [
+            "hours-location",
+            "appointments",
+            "urgent-emergency"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "what's the address of the clinic",
+          "kind": "direct",
+          "relevant": [
+            "hours-location",
+            "parking-directions"
+          ],
+          "top_docs": [
+            "hours-location",
+            "parking-directions",
+            "urgent-emergency"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "do you close for thanksgiving",
+          "kind": "paraphrase",
+          "relevant": [
+            "hours-location"
+          ],
+          "top_docs": [
+            "hours-location",
+            "lab-work",
+            "urgent-emergency"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "Is there parking at the building?",
+          "kind": "direct",
+          "relevant": [
+            "parking-directions"
+          ],
+          "top_docs": [
+            "parking-directions",
+            "accessibility",
+            "hours-location"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "which bus goes to your office",
+          "kind": "paraphrase",
+          "relevant": [
+            "parking-directions"
+          ],
+          "top_docs": [
+            "telehealth",
+            "accessibility",
+            "insurance"
+          ],
+          "rank": 4,
+          "confidence": 0.4615,
+          "confident": true
+        },
+        {
+          "query": "where do I leave my car",
+          "kind": "paraphrase",
+          "relevant": [
+            "parking-directions"
+          ],
+          "top_docs": [
+            "pediatrics",
+            "providers",
+            "vaccines"
+          ],
+          "rank": null,
+          "confidence": 0.8393,
+          "confident": true
+        },
+        {
+          "query": "Do you take Blue Harbor PPO?",
+          "kind": "asr",
+          "relevant": [
+            "insurance"
+          ],
+          "top_docs": [
+            "insurance",
+            "parking-directions",
+            "hours-location"
+          ],
+          "rank": 1,
+          "confidence": 0.5882,
+          "confident": true
+        },
+        {
+          "query": "is my medicare accepted",
+          "kind": "paraphrase",
+          "relevant": [
+            "insurance"
+          ],
+          "top_docs": [
+            "insurance",
+            "vaccines",
+            "new-patients"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "I don't have insurance, how much is a visit",
+          "kind": "paraphrase",
+          "relevant": [
+            "insurance"
+          ],
+          "top_docs": [
+            "insurance",
+            "telehealth",
+            "vaccines"
+          ],
+          "rank": 1,
+          "confidence": 0.7333,
+          "confident": true
+        },
+        {
+          "query": "what should I bring to my first visit",
+          "kind": "direct",
+          "relevant": [
+            "new-patients"
+          ],
+          "top_docs": [
+            "new-patients",
+            "lab-work",
+            "medical-records"
+          ],
+          "rank": 1,
+          "confidence": 0.7143,
+          "confident": true
+        },
+        {
+          "query": "I'm a new patient, what paperwork do I need to fill out",
+          "kind": "paraphrase",
+          "relevant": [
+            "new-patients"
+          ],
+          "top_docs": [
+            "new-patients",
+            "insurance",
+            "appointments"
+          ],
+          "rank": 1,
+          "confidence": 0.7273,
+          "confident": true
+        },
+        {
+          "query": "how much is the fee if I cancel late",
+          "kind": "direct",
+          "relevant": [
+            "cancellation-policy"
+          ],
+          "top_docs": [
+            "cancellation-policy",
+            "appointments",
+            "medical-records"
+          ],
+          "rank": 1,
+          "confidence": 0.7647,
+          "confident": true
+        },
+        {
+          "query": "what happens if I miss my appointment",
+          "kind": "paraphrase",
+          "relevant": [
+            "cancellation-policy"
+          ],
+          "top_docs": [
+            "cancellation-policy",
+            "appointments",
+            "lab-work"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "is there a charge to reschedule",
+          "kind": "paraphrase",
+          "relevant": [
+            "cancellation-policy"
+          ],
+          "top_docs": [
+            "cancellation-policy",
+            "appointments",
+            "prescription-refills"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "I need a refill on my blood pressure medication",
+          "kind": "direct",
+          "relevant": [
+            "prescription-refills"
+          ],
+          "top_docs": [
+            "prescription-refills",
+            "lab-work",
+            "providers"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "presciption refil",
+          "kind": "asr",
+          "relevant": [
+            "prescription-refills"
+          ],
+          "top_docs": [
+            "prescription-refills",
+            "cancellation-policy",
+            "appointments"
+          ],
+          "rank": 1,
+          "confidence": 0.8814,
+          "confident": true
+        },
+        {
+          "query": "kan i get my perscription filled",
+          "kind": "asr",
+          "relevant": [
+            "prescription-refills"
+          ],
+          "top_docs": [
+            "prescription-refills",
+            "appointments",
+            "new-patients"
+          ],
+          "rank": 1,
+          "confidence": 0.5524,
+          "confident": true
+        },
+        {
+          "query": "do I need to fast before my blood test",
+          "kind": "direct",
+          "relevant": [
+            "lab-work"
+          ],
+          "top_docs": [
+            "lab-work",
+            "prescription-refills",
+            "test-results"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "fasting for colesterol test can I drink coffee",
+          "kind": "asr",
+          "relevant": [
+            "lab-work"
+          ],
+          "top_docs": [
+            "lab-work",
+            "test-results",
+            "new-patients"
+          ],
+          "rank": 1,
+          "confidence": 0.9471,
+          "confident": true
+        },
+        {
+          "query": "how long until I get my lab results back",
+          "kind": "paraphrase",
+          "relevant": [
+            "test-results"
+          ],
+          "top_docs": [
+            "test-results",
+            "appointments",
+            "telehealth"
+          ],
+          "rank": 1,
+          "confidence": 0.5909,
+          "confident": true
+        },
+        {
+          "query": "the doctor hasn't called about my biopsy",
+          "kind": "paraphrase",
+          "relevant": [
+            "test-results"
+          ],
+          "top_docs": [
+            "new-patients",
+            "medical-records",
+            "test-results"
+          ],
+          "rank": 3,
+          "confidence": 0.6667,
+          "confident": true
+        },
+        {
+          "query": "can I see the doctor over video",
+          "kind": "paraphrase",
+          "relevant": [
+            "telehealth"
+          ],
+          "top_docs": [
+            "telehealth",
+            "medical-records",
+            "new-patients"
+          ],
+          "rank": 1,
+          "confidence": 0.4259,
+          "confident": true
+        },
+        {
+          "query": "tele health appointment",
+          "kind": "asr",
+          "relevant": [
+            "telehealth"
+          ],
+          "top_docs": [
+            "telehealth",
+            "prescription-refills",
+            "test-results"
+          ],
+          "rank": 1,
+          "confidence": 0.75,
+          "confident": true
+        },
+        {
+          "query": "when can I get a flu shot",
+          "kind": "direct",
+          "relevant": [
+            "vaccines"
+          ],
+          "top_docs": [
+            "vaccines",
+            "cancellation-policy",
+            "lab-work"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "do you do vacines for kids",
+          "kind": "asr",
+          "relevant": [
+            "vaccines",
+            "pediatrics"
+          ],
+          "top_docs": [
+            "vaccines",
+            "providers",
+            "telehealth"
+          ],
+          "rank": 1,
+          "confidence": 0.48,
+          "confident": true
+        },
+        {
+          "query": "does the pediatrician see newborns",
+          "kind": "direct",
+          "relevant": [
+            "pediatrics"
+          ],
+          "top_docs": [
+            "pediatrics",
+            "providers",
+            "hours-location"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "my son needs a sports physical form",
+          "kind": "paraphrase",
+          "relevant": [
+            "pediatrics"
+          ],
+          "top_docs": [
+            "pediatrics",
+            "telehealth",
+            "providers"
+          ],
+          "rank": 1,
+          "confidence": 0.6667,
+          "confident": true
+        },
+        {
+          "query": "can I set up a payment plan for my bill",
+          "kind": "direct",
+          "relevant": [
+            "billing"
+          ],
+          "top_docs": [
+            "billing",
+            "insurance",
+            "telehealth"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "can I pay over the phone with my credit card",
+          "kind": "paraphrase",
+          "relevant": [
+            "billing"
+          ],
+          "top_docs": [
+            "billing",
+            "insurance",
+            "test-results"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "how do I get a copy of my medical records",
+          "kind": "direct",
+          "relevant": [
+            "medical-records"
+          ],
+          "top_docs": [
+            "medical-records",
+            "new-patients",
+            "vaccines"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "can my wife call and ask about my health information",
+          "kind": "paraphrase",
+          "relevant": [
+            "medical-records"
+          ],
+          "top_docs": [
+            "medical-records",
+            "urgent-emergency",
+            "telehealth"
+          ],
+          "rank": 1,
+          "confidence": 0.6522,
+          "confident": true
+        },
+        {
+          "query": "I have chest pain what should I do",
+          "kind": "direct",
+          "relevant": [
+            "urgent-emergency"
+          ],
+          "top_docs": [
+            "urgent-emergency",
+            "medical-records",
+            "providers"
+          ],
+          "rank": 1,
+          "confidence": 0.6,
+          "confident": true
+        },
+        {
+          "query": "is there a nurse I can call at night",
+          "kind": "paraphrase",
+          "relevant": [
+            "urgent-emergency"
+          ],
+          "top_docs": [
+            "urgent-emergency",
+            "test-results",
+            "prescription-refills"
+          ],
+          "rank": 1,
+          "confidence": 0.8571,
+          "confident": true
+        },
+        {
+          "query": "I'm having thoughts of hurting myself",
+          "kind": "paraphrase",
+          "relevant": [
+            "urgent-emergency"
+          ],
+          "top_docs": [
+            "insurance",
+            "urgent-emergency",
+            "test-results"
+          ],
+          "rank": 2,
+          "confidence": 0.2,
+          "confident": false
+        },
+        {
+          "query": "do you have a doctor who speaks spanish",
+          "kind": "paraphrase",
+          "relevant": [
+            "interpreters-languages",
+            "providers",
+            "pediatrics"
+          ],
+          "top_docs": [
+            "interpreters-languages",
+            "providers",
+            "pediatrics"
+          ],
+          "rank": 1,
+          "confidence": 0.6667,
+          "confident": true
+        },
+        {
+          "query": "I need a sign language interpreter",
+          "kind": "direct",
+          "relevant": [
+            "interpreters-languages",
+            "accessibility"
+          ],
+          "top_docs": [
+            "interpreters-languages",
+            "appointments",
+            "accessibility"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "is the office wheelchair accessible",
+          "kind": "direct",
+          "relevant": [
+            "accessibility"
+          ],
+          "top_docs": [
+            "accessibility",
+            "telehealth",
+            "parking-directions"
+          ],
+          "rank": 1,
+          "confidence": 0.6667,
+          "confident": true
+        },
+        {
+          "query": "can I bring my service dog",
+          "kind": "paraphrase",
+          "relevant": [
+            "accessibility"
+          ],
+          "top_docs": [
+            "accessibility",
+            "providers",
+            "interpreters-languages"
+          ],
+          "rank": 1,
+          "confidence": 0.8214,
+          "confident": true
+        },
+        {
+          "query": "what does doctor okafor specialize in",
+          "kind": "direct",
+          "relevant": [
+            "providers"
+          ],
+          "top_docs": [
+            "new-patients",
+            "providers",
+            "medical-records"
+          ],
+          "rank": 2,
+          "confidence": 0.5556,
+          "confident": true
+        },
+        {
+          "query": "do you have a skin doctor",
+          "kind": "paraphrase",
+          "relevant": [
+            "providers"
+          ],
+          "top_docs": [
+            "new-patients",
+            "medical-records",
+            "providers"
+          ],
+          "rank": 3,
+          "confidence": 0.6,
+          "confident": true
+        },
+        {
+          "query": "is alex moreau taking new patients",
+          "kind": "direct",
+          "relevant": [
+            "providers",
+            "new-patients"
+          ],
+          "top_docs": [
+            "new-patients",
+            "providers",
+            "interpreters-languages"
+          ],
+          "rank": 1,
+          "confidence": 0.76,
+          "confident": true
+        },
+        {
+          "query": "how far in advance can I book an appointment",
+          "kind": "direct",
+          "relevant": [
+            "appointments"
+          ],
+          "top_docs": [
+            "appointments",
+            "cancellation-policy",
+            "telehealth"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "how early should I arrive",
+          "kind": "paraphrase",
+          "relevant": [
+            "appointments",
+            "new-patients"
+          ],
+          "top_docs": [
+            "appointments",
+            "medical-records",
+            "new-patients"
+          ],
+          "rank": 1,
+          "confidence": 0.6471,
+          "confident": true
+        },
+        {
+          "query": "wat ar yur ours on saterday",
+          "kind": "asr",
+          "relevant": [
+            "hours-location"
+          ],
+          "top_docs": [
+            "hours-location",
+            "lab-work",
+            "providers"
+          ],
+          "rank": 1,
+          "confidence": 0.3565,
+          "confident": false
+        },
+        {
+          "query": "I want to pay my balance online",
+          "kind": "paraphrase",
+          "relevant": [
+            "billing"
+          ],
+          "top_docs": [
+            "billing",
+            "insurance",
+            "appointments"
+          ],
+          "rank": 1,
+          "confidence": 1.0,
+          "confident": true
+        },
+        {
+          "query": "what's the weather going to be like tomorrow",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "cancellation-policy",
+            "accessibility",
+            "pediatrics"
+          ],
+          "rank": null,
+          "confidence": 0.3529,
+          "confident": false
+        },
+        {
+          "query": "who won the football game last night",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "parking-directions",
+            "urgent-emergency",
+            "lab-work"
+          ],
+          "rank": null,
+          "confidence": 0.2273,
+          "confident": false
+        },
+        {
+          "query": "can you recommend a good italian restaurant",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "vaccines",
+            "test-results",
+            "telehealth"
+          ],
+          "rank": null,
+          "confidence": 0.2727,
+          "confident": false
+        },
+        {
+          "query": "how do I reset my email password",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "billing",
+            "test-results",
+            "telehealth"
+          ],
+          "rank": null,
+          "confidence": 0.3125,
+          "confident": false
+        },
+        {
+          "query": "what is the capital of france",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "medical-records",
+            "insurance",
+            "pediatrics"
+          ],
+          "rank": null,
+          "confidence": 0.2667,
+          "confident": false
+        },
+        {
+          "query": "tell me a joke",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "urgent-emergency",
+            "appointments",
+            "telehealth"
+          ],
+          "rank": null,
+          "confidence": 0.0,
+          "confident": false
+        },
+        {
+          "query": "what's the stock price of apple",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "telehealth",
+            "cancellation-policy",
+            "parking-directions"
+          ],
+          "rank": null,
+          "confidence": 0.1667,
+          "confident": false
+        },
+        {
+          "query": "book me a flight to chicago",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "appointments",
+            "parking-directions",
+            "telehealth"
+          ],
+          "rank": null,
+          "confidence": 0.2727,
+          "confident": false
+        },
+        {
+          "query": "how do I cook brown rice",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "appointments",
+            "pediatrics",
+            "accessibility"
+          ],
+          "rank": null,
+          "confidence": 0.1538,
+          "confident": false
+        },
+        {
+          "query": "do you sell car insurance",
+          "kind": "out_of_scope",
+          "relevant": [],
+          "top_docs": [
+            "insurance",
+            "vaccines",
+            "new-patients"
+          ],
+          "rank": null,
+          "confidence": 0.7473,
+          "confident": true
+        }
+      ]
+    },
+    "fused+dense": {
+      "skipped": "dense backend unavailable"
+    }
+  }
+}

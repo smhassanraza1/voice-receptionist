@@ -1,0 +1,7 @@
+{
+  "trunk": {
+    "name": "lakeside-inbound",
+    "numbers": ["+1XXXXXXXXXX"],
+    "krisp_enabled": true
+  }
+}

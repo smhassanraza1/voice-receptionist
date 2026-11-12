@@ -1,0 +1,64 @@
+# Golden set for `python -m receptionist.mcp_server.rag.evaluate`.
+#
+# relevant: doc_ids that answer the query (any one counts as a hit); [] means out of scope,
+#           where the retriever should report no confident match.
+# kind:     direct | paraphrase | asr (speech-recognition style errors) | out_of_scope
+# Written before tuning; queries are not edited to make the retriever look better.
+
+- {query: "What time do you open on Saturday?", relevant: [hours-location], kind: direct}
+- {query: "are you open on sundays", relevant: [hours-location], kind: paraphrase}
+- {query: "what's the address of the clinic", relevant: [hours-location, parking-directions], kind: direct}
+- {query: "do you close for thanksgiving", relevant: [hours-location], kind: paraphrase}
+- {query: "Is there parking at the building?", relevant: [parking-directions], kind: direct}
+- {query: "which bus goes to your office", relevant: [parking-directions], kind: paraphrase}
+- {query: "where do I leave my car", relevant: [parking-directions], kind: paraphrase}
+- {query: "Do you take Blue Harbor PPO?", relevant: [insurance], kind: asr}
+- {query: "is my medicare accepted", relevant: [insurance], kind: paraphrase}
+- {query: "I don't have insurance, how much is a visit", relevant: [insurance], kind: paraphrase}
+- {query: "what should I bring to my first visit", relevant: [new-patients], kind: direct}
+- {query: "I'm a new patient, what paperwork do I need to fill out", relevant: [new-patients], kind: paraphrase}
+- {query: "how much is the fee if I cancel late", relevant: [cancellation-policy], kind: direct}
+- {query: "what happens if I miss my appointment", relevant: [cancellation-policy], kind: paraphrase}
+- {query: "is there a charge to reschedule", relevant: [cancellation-policy], kind: paraphrase}
+- {query: "I need a refill on my blood pressure medication", relevant: [prescription-refills], kind: direct}
+- {query: "presciption refil", relevant: [prescription-refills], kind: asr}
+- {query: "kan i get my perscription filled", relevant: [prescription-refills], kind: asr}
+- {query: "do I need to fast before my blood test", relevant: [lab-work], kind: direct}
+- {query: "fasting for colesterol test can I drink coffee", relevant: [lab-work], kind: asr}
+- {query: "how long until I get my lab results back", relevant: [test-results], kind: paraphrase}
+- {query: "the doctor hasn't called about my biopsy", relevant: [test-results], kind: paraphrase}
+- {query: "can I see the doctor over video", relevant: [telehealth], kind: paraphrase}
+- {query: "tele health appointment", relevant: [telehealth], kind: asr}
+- {query: "when can I get a flu shot", relevant: [vaccines], kind: direct}
+- {query: "do you do vacines for kids", relevant: [vaccines, pediatrics], kind: asr}
+- {query: "does the pediatrician see newborns", relevant: [pediatrics], kind: direct}
+- {query: "my son needs a sports physical form", relevant: [pediatrics], kind: paraphrase}
+- {query: "can I set up a payment plan for my bill", relevant: [billing], kind: direct}
+- {query: "can I pay over the phone with my credit card", relevant: [billing], kind: paraphrase}
+- {query: "how do I get a copy of my medical records", relevant: [medical-records], kind: direct}
+- {query: "can my wife call and ask about my health information", relevant: [medical-records], kind: paraphrase}
+- {query: "I have chest pain what should I do", relevant: [urgent-emergency], kind: direct}
+- {query: "is there a nurse I can call at night", relevant: [urgent-emergency], kind: paraphrase}
+- {query: "I'm having thoughts of hurting myself", relevant: [urgent-emergency], kind: paraphrase}
+- {query: "do you have a doctor who speaks spanish", relevant: [interpreters-languages, providers, pediatrics], kind: paraphrase}
+- {query: "I need a sign language interpreter", relevant: [interpreters-languages, accessibility], kind: direct}
+- {query: "is the office wheelchair accessible", relevant: [accessibility], kind: direct}
+- {query: "can I bring my service dog", relevant: [accessibility], kind: paraphrase}
+- {query: "what does doctor okafor specialize in", relevant: [providers], kind: direct}
+- {query: "do you have a skin doctor", relevant: [providers], kind: paraphrase}
+- {query: "is alex moreau taking new patients", relevant: [providers, new-patients], kind: direct}
+- {query: "how far in advance can I book an appointment", relevant: [appointments], kind: direct}
+- {query: "how early should I arrive", relevant: [appointments, new-patients], kind: paraphrase}
+- {query: "wat ar yur ours on saterday", relevant: [hours-location], kind: asr}
+- {query: "I want to pay my balance online", relevant: [billing], kind: paraphrase}
+
+- {query: "what's the weather going to be like tomorrow", relevant: [], kind: out_of_scope}
+- {query: "who won the football game last night", relevant: [], kind: out_of_scope}
+- {query: "can you recommend a good italian restaurant", relevant: [], kind: out_of_scope}
+- {query: "how do I reset my email password", relevant: [], kind: out_of_scope}
+- {query: "what is the capital of france", relevant: [], kind: out_of_scope}
+- {query: "tell me a joke", relevant: [], kind: out_of_scope}
+- {query: "what's the stock price of apple", relevant: [], kind: out_of_scope}
+- {query: "book me a flight to chicago", relevant: [], kind: out_of_scope}
+- {query: "how do I cook brown rice", relevant: [], kind: out_of_scope}
+- {query: "do you sell car insurance", relevant: [], kind: out_of_scope}

@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+.env.local
+.cache/
+data/*.db
+data/*.db-*
+.pytest_cache/
+.ruff_cache/
+node_modules/
+web/dist/
+web/.vite/
+evals/results/
+.DS_Store
+*.bundle

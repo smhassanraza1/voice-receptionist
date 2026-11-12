@@ -1,0 +1,64 @@
+# docker compose up --build
+# Needs a .env (see .env.example) with LIVEKIT_URL pointing at a LiveKit Cloud project, and an
+# MCP_AUTH_TOKEN minted for the in-network MCP address: make token AUDIENCE=http://mcp:8765/mcp
+
+x-app: &app
+  build: .
+  env_file: .env
+  restart: unless-stopped
+
+x-healthcheck: &healthcheck
+  interval: 10s
+  timeout: 3s
+  retries: 5
+  start_period: 10s
+
+services:
+  mcp:
+    <<: *app
+    command: python -m receptionist.mcp_server
+    environment:
+      MCP_HOST: 0.0.0.0
+      MCP_SERVER_URL: http://mcp:8765/mcp
+      MCP_DB_PATH: /app/data/db/clinic.db
+    volumes: [clinic-data:/app/data/db]
+    ports: ["127.0.0.1:8765:8765"]
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8765/healthz')"]
+
+  billing:
+    <<: *app
+    command: python -m receptionist.billing_agent
+    environment:
+      BILLING_AGENT_HOST: 0.0.0.0
+      BILLING_AGENT_URL: http://billing:8766
+    ports: ["127.0.0.1:8766:8766"]
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8766/.well-known/agent-card.json')"]
+
+  web:
+    <<: *app
+    command: python -m receptionist.web
+    environment:
+      WEB_HOST: 0.0.0.0
+    ports: ["8000:8000"]
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz')"]
+
+  agent:
+    <<: *app
+    command: python -m receptionist.agent start
+    environment:
+      MCP_SERVER_URL: http://mcp:8765/mcp
+      BILLING_AGENT_URL: http://billing:8766
+      WEB_BASE_URL: http://web:8000
+    depends_on:
+      mcp: { condition: service_healthy }
+      billing: { condition: service_healthy }
+      web: { condition: service_healthy }
+
+volumes:
+  clinic-data:

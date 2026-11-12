@@ -1,0 +1,17 @@
+# Scripted voice probes (same audio for every architecture). See receptionist/evals/voice/probes.py.
+- id: kb-saturday
+  say: Hi, what time do you open on Saturdays?
+- id: availability
+  say: I'd like to see a dermatologist sometime next week, any day is fine.
+- id: barge-in
+  say: Can you walk me through everything I need to bring to a first visit?
+  interrupt:
+    after_ms: 1500
+    say: Sorry, quick question, where exactly are you located?
+- id: backchannel
+  say: How does your cancellation policy work?
+  backchannel:
+    after_ms: 1200
+    say: Mm-hmm.
+- id: spanish
+  say: ¿Tienen algún médico que hable español?

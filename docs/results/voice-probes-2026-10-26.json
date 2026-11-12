@@ -1,0 +1,56 @@
+{
+  "pipeline": {
+    "calls": 3,
+    "ttfa_ms": {
+      "p50": 4031.2,
+      "p90": 5034.7,
+      "mean": 3944.9,
+      "n": 15
+    },
+    "greeting_ms": {
+      "p50": 2133.6
+    },
+    "barge_in": {
+      "stop_rate": 1.0,
+      "stop_latency_p50_ms": 1099.8,
+      "stop_latency_p90_ms": 1116.8,
+      "n": 3
+    },
+    "backchannel": {
+      "false_interruption_rate": 0.0,
+      "outcomes": {
+        "continued": 2,
+        "paused_resumed": 0,
+        "stopped": 0
+      },
+      "n": 2
+    }
+  },
+  "realtime": {
+    "calls": 3,
+    "ttfa_ms": {
+      "p50": 1889.4,
+      "p90": 3521.7,
+      "mean": 2340.5,
+      "n": 15
+    },
+    "greeting_ms": {
+      "p50": 2852.4
+    },
+    "barge_in": {
+      "stop_rate": 1.0,
+      "stop_latency_p50_ms": 979.7,
+      "stop_latency_p90_ms": 990.1,
+      "n": 3
+    },
+    "backchannel": {
+      "false_interruption_rate": 0.0,
+      "outcomes": {
+        "continued": 3,
+        "paused_resumed": 0,
+        "stopped": 0
+      },
+      "n": 3
+    }
+  }
+}

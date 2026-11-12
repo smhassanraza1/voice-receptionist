@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.3
+        with:
+          python-version: "3.12"
+          enable-cache: true
+      - run: uv sync --frozen
+      - name: Install livekit-server (for the voice harness tests)
+        run: curl -sSL https://get.livekit.io | bash
+      - run: uv run ruff check src tests
+      - run: uv run ruff format --check src tests
+      - name: Tests (offline, no API keys)
+        run: uv run pytest -q
+      - name: Retrieval eval matches the committed results
+        run: |
+          uv run python -m receptionist.mcp_server.rag.evaluate
+          git diff --exit-code docs/results/rag_eval.json
+      - name: Cost model
+        run: uv run python -m receptionist.evals.cost
+
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: docker build -t voice-receptionist .
+      - name: Services start and pass their health checks
+        run: |
+          cat > .env <<EOF
+          MCP_JWT_SECRET=$(openssl rand -hex 32)
+          BILLING_AGENT_TOKEN=$(openssl rand -hex 16)
+          INTERNAL_API_TOKEN=$(openssl rand -hex 16)
+          OPERATOR_PASSCODE=$(openssl rand -hex 8)
+          BILLING_AGENT_LLM=off
+          EOF
+          docker compose up -d --wait mcp billing web
+      - if: failure()
+        run: docker compose logs

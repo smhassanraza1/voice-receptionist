@@ -1,0 +1,88 @@
+/*
+ * Design tokens. Warm chart-paper neutrals, a deep lake green for the clinic, and a vermilion
+ * reserved for "live" and "hang up". Every text token clears 4.5:1 on --surface, --paper and
+ * --well in both themes; --control clears 3:1 for form-control boundaries.
+ */
+:root {
+  color-scheme: light;
+
+  --paper: #f3f0e8;
+  --surface: #fbfaf6;
+  --well: #efebe1;
+  --ink: #17201e;
+  --ink-2: #48524e;
+  --ink-3: #636c67;
+  --line: #dcd7ca;
+  --line-soft: #e8e4d9;
+  --line-strong: #c3bdae;
+  --control: #868c86;
+
+  --accent: #0e5a53;
+  --accent-hover: #0a4842;
+  --accent-text: #0b5049;
+  --accent-soft: #dcebe6;
+  --on-accent: #fbfaf6;
+
+  --signal: #b23a24;
+  --signal-hover: #962f1c;
+  --signal-soft: #f7e4dc;
+  --on-signal: #ffffff;
+
+  --billing: #6b4a12;
+  --billing-soft: #f4ead2;
+  --good: #21703a;
+  --warn: #8a5a00;
+
+  --focus: #0e5a53;
+  --shadow-card: 0 1px 0 rgb(23 32 30 / 0.03), 0 10px 30px -18px rgb(23 32 30 / 0.28);
+  --shadow-pop: 0 12px 32px -12px rgb(23 32 30 / 0.3), 0 2px 6px rgb(23 32 30 / 0.06);
+  --grain-opacity: 0.05;
+
+  --font-display: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --font-sans: 'IBM Plex Sans', 'Segoe UI', system-ui, -apple-system, 'Noto Sans', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  --radius: 16px;
+  --radius-md: 12px;
+  --radius-sm: 9px;
+  --page-max: 1240px;
+  --gutter: clamp(16px, 3vw, 28px);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    --paper: #0c1211;
+    --surface: #131b1a;
+    --well: #0f1716;
+    --ink: #e7ebe7;
+    --ink-2: #b3bcb7;
+    --ink-3: #8f9994;
+    --line: #27322f;
+    --line-soft: #1f2927;
+    --line-strong: #3a4743;
+    --control: #65716c;
+
+    --accent: #5ab8aa;
+    --accent-hover: #74c9bc;
+    --accent-text: #7dd0c3;
+    --accent-soft: #14302c;
+    --on-accent: #062320;
+
+    --signal: #f07a62;
+    --signal-hover: #f59580;
+    --signal-soft: #33201b;
+    --on-signal: #1a0c09;
+
+    --billing: #e3c07a;
+    --billing-soft: #2c2414;
+    --good: #6fcf8a;
+    --warn: #e0b25a;
+
+    --focus: #7dd0c3;
+    --shadow-card: 0 1px 0 rgb(0 0 0 / 0.25), 0 14px 34px -20px rgb(0 0 0 / 0.7);
+    --shadow-pop: 0 14px 36px -12px rgb(0 0 0 / 0.75), 0 2px 6px rgb(0 0 0 / 0.4);
+    --grain-opacity: 0.035;
+  }
+}

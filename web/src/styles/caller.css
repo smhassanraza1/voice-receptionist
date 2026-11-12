@@ -1,0 +1,624 @@
+/* Caller page: call setup, the in-call console, and the transcript. */
+
+.caller-layout {
+  width: 100%;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 12px var(--gutter) 48px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(340px, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.caller-main {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+
+/* On a call, the behind-the-scenes panel takes the wider column. */
+.caller-layout:is([data-phase='connecting'], [data-phase='live']) {
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.3fr);
+}
+
+@media (max-width: 980px) {
+  .caller-layout,
+  .caller-layout:is([data-phase='connecting'], [data-phase='live']) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* -- intro + setup ------------------------------------------------------------------------ */
+
+.intro {
+  display: grid;
+  gap: 18px;
+  padding: clamp(22px, 3.6vw, 40px);
+}
+
+/* The one orchestrated entrance: the intro settles in, line by line. */
+.intro > * {
+  animation: rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.intro > :nth-child(2) {
+  animation-delay: 0.05s;
+}
+
+.intro > :nth-child(3) {
+  animation-delay: 0.1s;
+}
+
+.intro > :nth-child(4) {
+  animation-delay: 0.16s;
+}
+
+.intro > :nth-child(n + 5) {
+  animation-delay: 0.22s;
+}
+
+.intro__ended {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: var(--ink-2);
+  font-size: 0.92rem;
+}
+
+.intro__cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 18px;
+  padding-top: 6px;
+}
+
+.intro__fine {
+  color: var(--ink-3);
+  font-size: 0.85rem;
+  max-width: 34ch;
+}
+
+.call-setup {
+  display: grid;
+  gap: 20px;
+  padding: 20px 0 4px;
+  border-top: 1px solid var(--line);
+}
+
+.arch-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 600px) {
+  .arch-options {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.arch-option {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  padding: 16px 44px 16px 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.arch-option:hover {
+  border-color: var(--control);
+}
+
+/* A drawn radio in the corner: the native input, restyled, so it stays keyboard-operable. */
+.arch-option input {
+  appearance: none;
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  border: 1.5px solid var(--control);
+  border-radius: 50%;
+  background: var(--surface);
+  cursor: inherit;
+}
+
+.arch-option input:checked {
+  border-color: var(--accent);
+  background: radial-gradient(circle, var(--accent) 0 4.5px, var(--surface) 5px);
+}
+
+.arch-option input:focus-visible {
+  outline: none;
+}
+
+.arch-option:has(input:focus-visible) {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.arch-option:has(input:checked) {
+  border-color: var(--accent);
+  background: color-mix(in oklab, var(--accent-soft) 55%, var(--surface));
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.arch-option:has(input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.arch-option__title {
+  font-family: var(--font-display);
+  font-size: 1.22rem;
+  font-weight: 520;
+  letter-spacing: -0.01em;
+}
+
+.arch-option__blurb {
+  color: var(--ink-2);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.chip input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  margin: 0;
+  cursor: inherit;
+}
+
+.chip:has(input:focus-visible) {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 7px 14px;
+  border: 1px solid var(--control);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.chip:hover {
+  background: var(--well);
+}
+
+.chip:has(input:checked) {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--surface);
+}
+
+.chip:has(input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* -- things to try ------------------------------------------------------------------------ */
+
+.try {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(220px, 1fr);
+  gap: 18px 28px;
+  align-items: start;
+}
+
+.try > .eyebrow {
+  grid-column: 1 / -1;
+}
+
+.try__list {
+  display: grid;
+  gap: 10px;
+}
+
+.try__list li {
+  position: relative;
+  padding-left: 18px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.06rem;
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+
+.try__list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.65em;
+  width: 8px;
+  height: 1.5px;
+  background: var(--accent);
+}
+
+.patient-card {
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: var(--well);
+  border: 1px dashed var(--line-strong);
+}
+
+.patient-card__label {
+  margin-bottom: 10px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.patient-card dl {
+  display: grid;
+  gap: 8px;
+}
+
+.patient-card dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.88rem;
+}
+
+.patient-card dt {
+  color: var(--ink-3);
+}
+
+.patient-card dd {
+  font-weight: 500;
+  text-align: right;
+}
+
+@media (max-width: 640px) {
+  .try {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* -- in-call console ---------------------------------------------------------------------- */
+
+.console {
+  display: grid;
+  gap: 18px;
+  justify-items: center;
+  text-align: center;
+  animation: rise 0.4s ease both;
+}
+
+.console__top {
+  justify-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.console__timer {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.console__config {
+  color: var(--ink-3);
+  font-size: 0.84rem;
+}
+
+.live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 4px 10px;
+  border-radius: 999px;
+  background: var(--signal-soft);
+  color: var(--signal);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.live-pill--pending {
+  background: var(--well);
+  color: var(--ink-2);
+}
+
+.live-pill__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 0 color-mix(in oklab, var(--signal) 50%, transparent);
+  animation: pulse 1.8s ease-out infinite;
+}
+
+@keyframes pulse {
+  70% {
+    box-shadow: 0 0 0 7px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+.agent-visual {
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+}
+
+.agent-visual__well {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: clamp(190px, 42vw, 232px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 38%, color-mix(in oklab, var(--accent-soft) 85%, var(--surface)), var(--well) 72%);
+  border: 1px solid var(--line);
+}
+
+/* Breathing ring while it listens; a steadier one while it talks. */
+.agent-visual__well::after {
+  content: '';
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+  border: 1.5px solid color-mix(in oklab, var(--accent) 35%, transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.agent-visual[data-state='listening'] .agent-visual__well::after {
+  opacity: 1;
+  animation: breathe 2.6s ease-in-out infinite;
+}
+
+.agent-visual[data-state='speaking'] .agent-visual__well::after {
+  opacity: 1;
+  border-color: var(--accent);
+}
+
+@keyframes breathe {
+  50% {
+    transform: scale(1.035);
+    opacity: 0.35;
+  }
+}
+
+/* BarVisualizer markup: .lk-audio-bar-visualizer > .lk-audio-bar[data-lk-highlighted]. */
+.agent-bars {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  height: 46%;
+  width: 62%;
+}
+
+.agent-bars .lk-audio-bar {
+  flex: 1;
+  max-width: 14px;
+  min-height: 12px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--accent) 24%, transparent);
+  transition:
+    height 0.08s linear,
+    background-color 0.25s ease;
+}
+
+.agent-bars .lk-audio-bar[data-lk-highlighted='true'] {
+  background: var(--accent);
+}
+
+.agent-visual[data-state='failed'] .lk-audio-bar,
+.agent-visual[data-state='disconnected'] .lk-audio-bar {
+  background: var(--line-strong);
+}
+
+.agent-visual__caption {
+  display: grid;
+  gap: 2px;
+}
+
+.agent-visual__name {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.agent-visual__state {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.5rem;
+  letter-spacing: -0.01em;
+}
+
+.call-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.btn--control {
+  overflow: hidden;
+  background: var(--surface);
+  border-color: var(--control);
+  color: var(--ink);
+  min-width: 118px;
+}
+
+.btn--control:hover:not(:disabled) {
+  background: var(--well);
+}
+
+.btn--control[aria-pressed='true'] {
+  background: var(--signal-soft);
+  border-color: var(--signal);
+  color: var(--signal);
+}
+
+.btn--control[aria-pressed='true'] .mic-meter {
+  visibility: hidden;
+}
+
+/* Input level, so callers can see the mic is actually hearing them. */
+.mic-meter {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 6px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.mic-meter::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  transform-origin: left;
+  transform: scaleX(var(--level, 0));
+  transition: transform 0.08s linear;
+}
+
+/* -- transcript --------------------------------------------------------------------------- */
+
+.transcript__list {
+  max-height: min(440px, 55dvh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin: 0 -8px;
+  padding: 0 8px;
+  border-radius: var(--radius-sm);
+}
+
+.turn {
+  display: grid;
+  grid-template-columns: 118px minmax(0, 1fr);
+  gap: 4px 16px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line-soft);
+  animation: rise 0.3s ease both;
+}
+
+.turn:first-child {
+  border-top: 0;
+}
+
+.turn__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.turn__who {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.turn__who::before {
+  content: '';
+  width: 3px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--ink-3);
+}
+
+.turn--receptionist .turn__who::before {
+  background: var(--accent);
+}
+
+.turn--staff .turn__who::before {
+  background: var(--billing);
+}
+
+.turn--caller .turn__who::before {
+  background: var(--signal);
+}
+
+.turn__time {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--ink-3);
+  padding-left: 10px;
+}
+
+.turn__text {
+  font-size: 1rem;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.turn--receptionist .turn__text {
+  font-family: var(--font-display);
+  font-size: 1.06rem;
+  line-height: 1.5;
+}
+
+.turn[data-interim] .turn__text {
+  color: var(--ink-3);
+}
+
+.turn[data-interim] .turn__text::after {
+  content: ' …';
+}
+
+@media (max-width: 560px) {
+  .turn {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .turn__meta {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .turn__time {
+    padding-left: 0;
+  }
+}

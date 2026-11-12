@@ -1,0 +1,19 @@
+{
+  "dispatch_rule": {
+    "name": "lakeside-receptionist",
+    "trunk_ids": ["ST_REPLACE_WITH_TRUNK_ID"],
+    "rule": {
+      "dispatch_rule_individual": {
+        "room_prefix": "call-"
+      }
+    },
+    "room_config": {
+      "agents": [
+        {
+          "agent_name": "receptionist",
+          "metadata": "{\"mode\": \"realtime\", \"language\": \"auto\"}"
+        }
+      ]
+    }
+  }
+}

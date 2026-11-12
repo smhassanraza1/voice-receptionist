@@ -1,0 +1,861 @@
+/*
+ * "Behind the scenes": the call-flow diagram, the activity feed and reply time.
+ * The panel is the back room next to the paper front desk, so it always uses the dark palette:
+ * it re-declares the tokens, and everything inside (chart, table, hints) follows them.
+ */
+
+.backstage {
+  color-scheme: dark;
+  --surface: #12201e;
+  --well: #0c1716;
+  --ink: #e7ebe7;
+  --ink-2: #b3bfba;
+  --ink-3: #8f9b96;
+  --line: #263431;
+  --line-soft: #1d2a28;
+  --line-strong: #3a4945;
+  --control: #65716c;
+  --accent: #5ab8aa;
+  --accent-text: #7dd0c3;
+  --accent-soft: #163631;
+  --on-accent: #062320;
+  --signal: #f07a62;
+  --signal-soft: #36211c;
+  --billing: #e3c07a;
+  --billing-soft: #2e2615;
+  --focus: #7dd0c3;
+  --shadow-pop: 0 14px 36px -12px rgb(0 0 0 / 0.75), 0 2px 6px rgb(0 0 0 / 0.4);
+  --grid: rgb(125 208 195 / 0.05);
+
+  container: backstage / inline-size;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #22302d;
+  border-radius: var(--radius);
+  color: var(--ink);
+  background:
+    radial-gradient(120% 50% at 100% 0%, color-mix(in oklab, var(--accent) 14%, transparent), transparent 62%),
+    linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 24px 24px,
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 24px 24px,
+    var(--surface);
+  box-shadow: 0 1px 0 rgb(0 0 0 / 0.2), 0 24px 48px -28px rgb(8 20 18 / 0.7);
+  animation: rise 0.6s 0.15s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+
+.backstage__header {
+  padding: 22px 22px 18px;
+}
+
+.backstage__kicker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.backstage__light {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--line-strong);
+}
+
+.backstage__light[data-on] {
+  background: var(--signal);
+  box-shadow: 0 0 0 0 color-mix(in oklab, var(--signal) 50%, transparent);
+  animation: pulse 1.8s ease-out infinite;
+}
+
+.backstage__title {
+  margin-top: 8px;
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  font-weight: 470;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+}
+
+.backstage__lede {
+  margin-top: 8px;
+  max-width: 46ch;
+  color: var(--ink-2);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+/* Live readout: the raw signals the diagram is drawn from. */
+.readout {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: color-mix(in oklab, var(--well) 70%, transparent);
+}
+
+.readout > div {
+  min-width: 0;
+  padding: 8px 12px;
+}
+
+.readout > div + div {
+  border-left: 1px solid var(--line);
+}
+
+.readout dt {
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.readout dd {
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--accent-text);
+}
+
+/* The engineering layer under a plain sentence: the real names, routes and numbers. */
+.tech {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-3);
+  font-size: 0.7rem;
+  line-height: 1.5;
+  overflow-wrap: break-word;
+}
+
+.tech__part {
+  white-space: nowrap;
+}
+
+.backstage__section {
+  padding: 18px 22px;
+  border-top: 1px solid var(--line);
+}
+
+.backstage__section > .eyebrow {
+  margin-bottom: 10px;
+}
+
+/* With room to spare (the wide in-call column), the flow and what it did sit side by side. */
+@container backstage (min-width: 680px) {
+  .backstage__body[data-split] {
+    display: grid;
+    grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr);
+    border-top: 1px solid var(--line);
+  }
+
+  .backstage__body[data-split] > .backstage__section {
+    border-top: 0;
+  }
+
+  .backstage__side {
+    border-left: 1px solid var(--line);
+  }
+
+  .backstage__side > .backstage__section:first-child {
+    border-top: 0;
+  }
+
+  /* The side column is narrow: the order already says when, so the clock goes. */
+  .backstage__side .activity__time {
+    display: none;
+  }
+}
+
+/* -- call flow ---------------------------------------------------------------------------- */
+
+.call-flow {
+  display: grid;
+}
+
+.stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 10px;
+  padding-bottom: 6px;
+}
+
+/* The wire from this step down to the next one. */
+.stage:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 10.5px;
+  top: 30px;
+  bottom: -16px;
+  width: 1px;
+  background: var(--line-strong);
+}
+
+/* While a step is live, a pulse travels down its wire. */
+.call-flow[data-live] .stage[data-active]:not(:last-child)::before {
+  width: 2px;
+  left: 10px;
+  background: linear-gradient(to bottom, transparent, var(--accent) 45%, transparent 55%) 0 0 / 100% 200%,
+    var(--line-strong);
+  animation: travel 1.1s linear infinite;
+}
+
+@keyframes travel {
+  from {
+    background-position: 0 100%, 0 0;
+  }
+  to {
+    background-position: 0 -100%, 0 0;
+  }
+}
+
+.stage__node {
+  justify-self: center;
+  width: 11px;
+  height: 11px;
+  margin-top: 15px;
+  border-radius: 50%;
+  border: 1.5px solid var(--control);
+  background: var(--surface);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.stage[data-active] .stage__node {
+  border-color: var(--accent);
+  background: var(--accent);
+  box-shadow:
+    0 0 0 4px color-mix(in oklab, var(--accent) 22%, transparent),
+    0 0 18px color-mix(in oklab, var(--accent) 55%, transparent);
+}
+
+.stage__body {
+  min-width: 0;
+  padding: 9px 12px 10px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.stage[data-active] .stage__body {
+  border-color: color-mix(in oklab, var(--accent) 40%, transparent);
+  background: color-mix(in oklab, var(--accent-soft) 75%, transparent);
+}
+
+.stage__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.stage__title {
+  font-family: var(--font-display);
+  font-size: 1.04rem;
+  font-weight: 480;
+  line-height: 1.3;
+  letter-spacing: -0.005em;
+}
+
+.stage__now {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.stage__text {
+  margin-top: 3px;
+  color: var(--ink-2);
+  font-size: 0.84rem;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.stage__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin-top: 7px;
+}
+
+.stage__tag {
+  padding: 1px 7px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  color: var(--ink-2);
+  font-size: 0.7rem;
+}
+
+.stage__metric {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-text);
+}
+
+/* Speech-to-speech: the one model's three jobs, the current one lit. */
+.phases {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 10px;
+}
+
+.phases__item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.phases__item + .phases__item::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  width: 10px;
+  border-top: 1px solid var(--line-strong);
+}
+
+.phases__item[data-active] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+/* The side systems hang off the "works out the reply" step. */
+.branches {
+  margin-top: 12px;
+}
+
+.branches__label {
+  margin-bottom: 6px;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.branches__list {
+  display: grid;
+  gap: 6px;
+}
+
+.branch {
+  --tone: var(--accent);
+  --tone-text: var(--accent-text);
+  --tone-soft: var(--accent-soft);
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0 10px;
+  padding: 7px 10px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 8px;
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.branch[data-state='connected'] {
+  --tone: var(--billing);
+  --tone-text: var(--billing);
+  --tone-soft: var(--billing-soft);
+}
+
+.branch:not([data-state='idle']) {
+  border-style: solid;
+  border-color: var(--tone);
+  background: var(--tone-soft);
+}
+
+.branch__head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.branch__title {
+  font-size: 0.86rem;
+  font-weight: 500;
+}
+
+.branch__via {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  color: var(--ink-3);
+}
+
+.branch__text {
+  grid-column: 1;
+  color: var(--ink-3);
+  font-size: 0.78rem;
+}
+
+.branch__state {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--tone-text);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.branch__state::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: blink 1s ease-in-out infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.branches__doing {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--line-strong);
+  animation: rise 0.25s ease both;
+}
+
+.branches__doing p {
+  color: var(--accent-text);
+  font-size: 0.84rem;
+  font-weight: 500;
+}
+
+/* What speech-to-text has heard so far, while the caller talks. */
+.heard {
+  margin-top: 8px;
+  padding: 6px 10px;
+  border-left: 2px solid var(--accent);
+  border-radius: 0 6px 6px 0;
+  background: color-mix(in oklab, var(--well) 70%, transparent);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+/* -- activity ----------------------------------------------------------------------------- */
+
+.activity {
+  display: grid;
+}
+
+.activity__item {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto auto;
+  align-items: start;
+  gap: 10px;
+  padding: 7px 0;
+  border-top: 1px solid var(--line-soft);
+  font-size: 0.86rem;
+  animation: rise 0.3s ease both;
+}
+
+.activity__item:first-child {
+  border-top: 0;
+}
+
+.activity__icon {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--well);
+  border: 1px solid var(--line);
+  color: var(--ink-2);
+}
+
+.activity__item[data-tone='good'] .activity__icon {
+  background: var(--accent-soft);
+  border-color: transparent;
+  color: var(--accent-text);
+}
+
+.activity__item[data-tone='bad'] .activity__icon {
+  background: var(--signal-soft);
+  border-color: transparent;
+  color: var(--signal);
+}
+
+.activity__item[data-tone='handoff'] .activity__icon {
+  background: var(--billing-soft);
+  border-color: transparent;
+  color: var(--billing);
+}
+
+.activity__body {
+  min-width: 0;
+}
+
+.activity__text {
+  text-wrap: pretty;
+}
+
+.activity__args summary {
+  width: fit-content;
+  margin-top: 2px;
+  border-radius: 4px;
+  color: var(--accent-text);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  cursor: pointer;
+}
+
+.activity__args pre {
+  margin: 6px 0 2px;
+  padding: 8px 10px;
+  max-height: 180px;
+  overflow: auto;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: var(--well);
+  font-size: 0.7rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.activity__item[data-tone='bad'] .activity__text {
+  color: var(--signal);
+}
+
+.activity__detail,
+.activity__time {
+  padding-top: 3px;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.activity__detail {
+  font-size: 0.74rem;
+  color: var(--ink-2);
+}
+
+.activity__time {
+  font-size: 0.68rem;
+  color: var(--ink-3);
+}
+
+@media (max-width: 420px) {
+  .activity__time {
+    display: none;
+  }
+}
+
+/* -- reply time --------------------------------------------------------------------------- */
+
+.reply-time__value {
+  font-family: var(--font-display);
+  font-size: 2.6rem;
+  font-weight: 460;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-text);
+}
+
+.reply-time__label {
+  margin-top: 8px;
+  color: var(--ink-3);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.reply-time__label span {
+  color: var(--ink-2);
+}
+
+.reply-details {
+  margin-top: 14px;
+}
+
+.reply-details > .toggle-group {
+  margin: 12px 0 10px;
+}
+
+.reply-details__summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  list-style: none;
+  border-radius: 6px;
+  color: var(--accent-text);
+  font-size: 0.86rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.reply-details__summary::-webkit-details-marker {
+  display: none;
+}
+
+.reply-details__summary::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 0.15s ease;
+}
+
+details[open] > .reply-details__summary::before {
+  transform: rotate(45deg);
+}
+
+/* -- reply-time chart and table ----------------------------------------------------------- */
+
+.toggle-group {
+  display: inline-flex;
+  margin: 0;
+  min-width: 0;
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid var(--control);
+}
+
+.toggle-group__item {
+  min-height: 28px;
+  padding: 3px 11px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-2);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.toggle-group__item[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--surface);
+}
+
+.latency-chart {
+  position: relative;
+  border-radius: var(--radius-sm);
+}
+
+.latency-chart__scrubber {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.latency-chart:has(.latency-chart__scrubber:focus-visible) {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+}
+
+.latency-chart svg {
+  display: block;
+  overflow: visible;
+  touch-action: pan-y;
+}
+
+.latency-chart text {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  fill: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.latency-chart__tick line {
+  stroke: var(--line-soft);
+  stroke-width: 1;
+}
+
+.latency-chart__baseline {
+  stroke: var(--line-strong);
+  stroke-width: 1;
+}
+
+.latency-chart__bar {
+  fill: var(--accent);
+  transition: opacity 0.15s ease;
+}
+
+.latency-chart__bar[data-dim] {
+  opacity: 0.32;
+}
+
+.latency-chart__p50 {
+  stroke: var(--ink);
+  stroke-width: 1.25;
+}
+
+.chart-key {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px 14px;
+  margin-bottom: 6px;
+  font-size: 0.74rem;
+  color: var(--ink-2);
+}
+
+.chart-key__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.chart-key__swatch {
+  display: inline-block;
+}
+
+.chart-key__swatch--bar {
+  width: 8px;
+  height: 10px;
+  border-radius: 2px 2px 0 0;
+  background: var(--accent);
+}
+
+.chart-key__swatch--line {
+  width: 14px;
+  height: 1.5px;
+  background: var(--ink);
+}
+
+.chart-readout {
+  position: absolute;
+  z-index: 2;
+  transform: translate(-50%, calc(-100% - 10px));
+  min-width: 176px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: var(--shadow-pop);
+  pointer-events: none;
+  font-size: 0.78rem;
+}
+
+.chart-readout__value {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.chart-readout__value span {
+  font-size: 0.76rem;
+  font-weight: 400;
+  color: var(--ink-3);
+}
+
+.chart-readout__label {
+  color: var(--ink-3);
+  margin-bottom: 6px;
+}
+
+.chart-readout__rows {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 14px;
+}
+
+.chart-readout__rows dt {
+  color: var(--ink-2);
+}
+
+.chart-readout__rows dd {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  max-height: 260px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.data-table th,
+.data-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--line-soft);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.data-table th:first-child {
+  text-align: left;
+}
+
+.data-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--well);
+  color: var(--ink-3);
+  font-weight: 600;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.data-table tfoot th,
+.data-table tfoot td {
+  font-weight: 600;
+  border-bottom: 0;
+  border-top: 1px solid var(--line-strong);
+}

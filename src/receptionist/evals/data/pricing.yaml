@@ -1,0 +1,329 @@
+# Unit prices used by the eval harness to turn measured usage into USD.
+# Each entry lists its sources; `as_of` is the date the prices were checked.
+#
+# Units (per `kind`):
+#   realtime / llm : USD per 1M tokens
+#   stt            : USD per minute of streamed audio
+#   tts            : USD per 1M input characters
+#   infra/telephony: USD per minute
+# Where a provider has no cached-input discount, the `*_cached` price equals the uncached
+# price on purpose, so cached-token counts never under-bill.
+# cost.py prices measured usage by model id and reads the keys it needs. The other entries and
+# keys (list, overage and alternative-plan prices, models and carriers this repo doesn't run)
+# are reference data for comparing alternatives.
+as_of: "2026-10-21"
+currency: USD
+audio_tokens_per_second:        # used to convert audio seconds -> billable tokens
+  # OpenAI "Managing costs" guide: user audio = 1 token / 100 ms, assistant audio =
+  # 1 token / 50 ms. Not stated per model; check against usage.*.audio_tokens in eval runs.
+  openai_realtime_input: 10
+  openai_realtime_output: 20
+models:
+  # ---------------------------------------------------------------- speech-to-speech
+  - id: openai/gpt-realtime-2
+    kind: realtime
+    prices:
+      audio_input: 32.0
+      audio_input_cached: 0.4
+      audio_output: 64.0
+      text_input: 4.0
+      text_input_cached: 0.4
+      text_output: 24.0
+    confidence: high
+    sources:
+      - {title: "OpenAI - GPT-Realtime-2 model page", url: "https://developers.openai.com/api/docs/models/gpt-realtime-2", accessed: "2026-10-21"}
+      - {title: "OpenAI - Advancing voice intelligence with new models in the API", url: "https://openai.com/index/advancing-voice-intelligence-with-new-models-in-the-api/", accessed: "2026-10-21"}
+      - {title: "LiteLLM model_prices_and_context_window.json (cross-check)", url: "https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json", accessed: "2026-10-21"}
+    notes: >-
+      Released 2026-05-07. Reasoning tokens bill as text output ($24); default reasoning effort
+      is "low" (this repo sets "low"). Each response re-sends the whole conversation, and
+      automatic best-effort prompt caching bills repeated prefix tokens at $0.40. The page
+      itself was not fetched (blocked); figures come from search snippets of the official page
+      and match LiteLLM. Input-audio transcription (LiveKit default gpt-4o-mini-transcribe) is
+      billed separately; see openai/gpt-4o-mini-transcribe.
+
+  - id: openai/gpt-realtime-2.1
+    kind: realtime
+    prices:
+      audio_input: 32.0
+      audio_input_cached: 0.4
+      audio_output: 64.0
+      text_input: 4.0
+      text_input_cached: 0.4
+      text_output: 24.0
+    confidence: high
+    sources:
+      - {title: "OpenAI Developer Community - New Realtime models: gpt-realtime-2.1 and gpt-realtime-2.1-mini", url: "https://community.openai.com/t/new-realtime-models-on-the-api-gpt-realtime-2-1-and-gpt-realtime-2-1-mini/1385896", accessed: "2026-10-21"}
+      - {title: "OpenAI - GPT-Realtime-2.1 model page", url: "https://developers.openai.com/api/docs/models/gpt-realtime-2.1", accessed: "2026-10-21"}
+    notes: >-
+      Released 2026-07-06, same prices as gpt-realtime-2. OpenAI says the update cut p95 latency
+      by at least 25% across Realtime voice models through better caching (vendor claim, not
+      verified independently). Not yet in LiveKit 1.8.8's RealtimeModels literal, but any model
+      string is accepted.
+
+  - id: openai/gpt-realtime-2.1-mini
+    kind: realtime
+    prices:
+      audio_input: 10.0
+      audio_input_cached: 0.3
+      audio_output: 20.0
+      text_input: 0.6
+      text_input_cached: 0.06
+      text_output: 2.4
+    confidence: high
+    sources:
+      - {title: "OpenAI Developer Community - New Realtime models: gpt-realtime-2.1 and gpt-realtime-2.1-mini", url: "https://community.openai.com/t/new-realtime-models-on-the-api-gpt-realtime-2-1-and-gpt-realtime-2-1-mini/1385896", accessed: "2026-10-21"}
+      - {title: "OpenAI - GPT-Realtime-2.1 Mini model page", url: "https://developers.openai.com/api/docs/models/gpt-realtime-2.1-mini", accessed: "2026-10-21"}
+    notes: >-
+      Current cheap realtime tier. The OpenAI deprecations page names it the replacement for
+      gpt-realtime-mini, which shuts down 2027-01-20 (as do gpt-realtime and
+      gpt-realtime-2025-08-28). Forum reports of tool-calling regressions are anecdotal.
+
+  # ---------------------------------------------------------------- speech-to-text
+  - id: deepgram/nova-3
+    kind: stt
+    prices:
+      per_minute_streaming: 0.0048          # current PAYG (promotional) price, monolingual
+      per_minute_streaming_list: 0.0077     # struck-through regular price
+      per_minute_streaming_multilingual: 0.0058
+      per_minute_streaming_multilingual_list: 0.0092
+    confidence: medium
+    sources:
+      - {title: "Deepgram pricing", url: "https://deepgram.com/pricing", accessed: "2026-10-21"}
+      - {title: "Cartesia - Deepgram pricing 2026 (notes promo has no end date)", url: "https://www.cartesia.ai/learn/deepgram-pricing", accessed: "2026-10-21"}
+    notes: >-
+      Pay-as-you-go streaming. Deepgram labels these "limited-time promotional rates" with no
+      published end date; use the *_list keys for a conservative estimate. Billed on streamed
+      audio duration, and LiveKit streams the caller's audio continuously, so bill the whole
+      call, not just speech. Growth plan is about 12.5% below PAYG. Pre-recorded is
+      $0.0043/min. Not fetched (blocked); figures from search snippets of the pricing page,
+      with consistent third-party copies.
+
+  - id: deepgram/flux
+    kind: stt
+    prices:
+      per_minute_streaming: 0.0065          # flux-general-en
+      per_minute_streaming_multilingual: 0.0078   # flux-general-multi
+    confidence: medium
+    sources:
+      - {title: "Deepgram pricing (FAQ: Flux $0.39/hr mono, $0.47/hr multilingual)", url: "https://deepgram.com/pricing", accessed: "2026-10-21"}
+      - {title: "Deepgram - Flux Multilingual & language prompting", url: "https://developers.deepgram.com/docs/flux/language-prompting", accessed: "2026-10-21"}
+    notes: >-
+      Conversational STT with built-in end-of-turn detection (v2/listen). One third-party source
+      calls $0.0065 a promo against a $0.0077 list price. Deepgram's FAQ gives $0.39/hr, so
+      $0.0065 is used here. Eager end-of-turn can add 50-70% more LLM calls (Deepgram docs).
+      That cost lands on the LLM line, not here.
+
+  - id: openai/gpt-4o-mini-transcribe
+    kind: stt
+    prices:
+      input: 1.25                   # per 1M input tokens (audio, plus any prompt text)
+      output: 5.0                   # per 1M text output tokens
+      per_minute_streaming: 0.003   # OpenAI's per-minute estimate, used by the cost model
+    confidence: high
+    sources:
+      - {title: "OpenAI API pricing (transcription: $1.25 in / $5.00 out per 1M tokens, ~$0.003/min)", url: "https://developers.openai.com/api/docs/pricing", accessed: "2026-10-21"}
+      - {title: "OpenAI - gpt-4o-mini-transcribe model page", url: "https://developers.openai.com/api/docs/models/gpt-4o-mini-transcribe", accessed: "2026-10-21"}
+    notes: >-
+      Not part of the cascaded pipeline. LiveKit's OpenAI RealtimeModel enables input-audio
+      transcription with this model by default, so it is an extra cost of the OpenAI realtime
+      architecture. OpenAI bills it by tokens and LiveKit reports it as token usage (no audio
+      duration), so measured runs are priced from input/output; the per-minute estimate feeds
+      the per-call cost model. Applies to committed user audio only.
+
+  # ---------------------------------------------------------------- text-to-speech
+  - id: cartesia/sonic-3
+    kind: tts
+    prices:
+      per_1m_characters: 39.2           # Startup plan: $49/mo for 1.25M credits, 1 credit per char
+      per_1m_characters_overage: 45.0   # Startup overage
+    confidence: medium
+    sources:
+      - {title: "Cartesia pricing", url: "https://www.cartesia.ai/pricing", accessed: "2026-10-21"}
+      - {title: "Cartesia docs - Pricing (TTS ~1 credit per character)", url: "https://docs.cartesia.ai/pricing", accessed: "2026-10-21"}
+    notes: >-
+      There is no true pay-as-you-go tier. Plans: Pro $5/mo for 100K credits ($50/1M, overage
+      $65/1M), Startup $49/mo for 1.25M ($39.20/1M, overage $45/1M), Scale $299/mo for 8M
+      ($37.38/1M, overage $38/1M). The cheapest-per-character public self-serve tier for real
+      traffic is Startup, used here. Credits per character "can vary slightly" with
+      preprocessing. Cartesia says one minute of audio is about 750-800 credits. Not fetched
+      (blocked); figures from search snippets of cartesia.ai, consistent with third parties.
+
+  - id: elevenlabs/eleven_flash_v2_5
+    kind: tts
+    prices:
+      per_1m_characters: 40.0         # $0.04 / 1K chars, every plan and pay as you go
+    confidence: high
+    sources:
+      - {title: "ElevenLabs - ElevenAPI pricing (Flash / Turbo $0.04 per 1K characters on every plan and PAYG)", url: "https://elevenlabs.io/pricing/api", accessed: "2026-10-21"}
+      - {title: "ElevenLabs - ElevenAPI for developers (Turbo / Flash $0.04 per 1K characters)", url: "https://join.elevenlabs.io/api/developer-api", accessed: "2026-10-21"}
+      - {title: "ElevenLabs blog - We've lowered API & Agents pricing and introduced PAYG", url: "https://elevenlabs.io/blog/weve-lowered-api-agents-pricing-and-introduced-pay-as-you-go", accessed: "2026-10-21"}
+    notes: >-
+      Both official pages now list Flash/Turbo at $0.04/1K characters, the same on every plan
+      and on pay as you go; plans differ only in included characters. Both pages fetched
+      directly. Flash and Turbo are half the Multilingual rate ($0.08/1K). LiveKit's elevenlabs
+      plugin default is eleven_turbo_v2_5 (same price); this repo uses eleven_flash_v2_5.
+
+  - id: openai/gpt-4o-mini-tts
+    kind: tts
+    prices:
+      text_input: 0.60     # per 1M text input tokens
+      audio_output: 12.0   # per 1M audio output tokens
+    confidence: high
+    sources:
+      - {title: "OpenAI API pricing (gpt-4o-mini-tts: text $0.60 in, audio $12.00 out per 1M tokens)", url: "https://developers.openai.com/api/docs/pricing", accessed: "2026-10-21"}
+    notes: >-
+      Not used by either architecture: the voice eval harness synthesizes the simulated
+      caller's lines with it (EVAL_TTS_MODEL), cached on disk, so it is an eval cost, not a
+      per-call cost. Billed by tokens; the audio output dominates. Third-party summaries quote
+      OpenAI's estimate of about $0.015 per minute of speech (not seen on the pricing page).
+
+  # ---------------------------------------------------------------- text LLMs (pipeline)
+  - id: openai/gpt-4.1-mini
+    kind: llm
+    prices:
+      input: 0.40
+      cached_input: 0.10
+      output: 1.60
+    confidence: high
+    sources:
+      - {title: "OpenAI API pricing", url: "https://developers.openai.com/api/docs/pricing", accessed: "2026-10-21"}
+      - {title: "LiteLLM model_prices_and_context_window.json (cross-check)", url: "https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json", accessed: "2026-10-21"}
+    notes: >-
+      Non-reasoning, so no hidden output tokens. One secondary report gives an API shutdown of
+      2027-01-14 for GPT-4o/4o-mini/4.1/4.1-mini (unconfirmed). gpt-4.1-nano shuts down
+      2026-10-23 (OpenAI forum notice).
+
+  - id: openai/gpt-5.6-luna
+    kind: llm
+    prices:
+      input: 0.20
+      cached_input: 0.02
+      output: 1.20
+    confidence: medium
+    sources:
+      - {title: "OpenAI Developer Community - Major price drop for 5.6 Terra and Luna", url: "https://community.openai.com/t/announcing-a-major-price-drop-for-5-6-terra-and-luna-and-fast-mode-for-5-6-sol/1388484", accessed: "2026-10-21"}
+      - {title: "OpenAI - GPT-5.6 Luna model page", url: "https://developers.openai.com/api/docs/models/gpt-5.6-luna", accessed: "2026-10-21"}
+    notes: >-
+      Smallest GPT-5.6 tier, and the default backend model for LiveKit's GPT-Live integration.
+      Price cut on 2026-07-30 from $1.00/$6.00. Cached input of $0.02 comes from LiteLLM and
+      aggregators, not seen on an OpenAI page. Reasoning model: reasoning tokens bill as output,
+      so set minimal or low effort for voice. Third-party TTFT is about 1.6-2.1 s, slower than
+      gpt-4.1-mini.
+
+  - id: openai/gpt-5.4-mini
+    kind: llm
+    prices:
+      input: 0.75
+      cached_input: 0.075
+      output: 4.50
+    confidence: medium
+    sources:
+      - {title: "OpenAI API pricing (via LiteLLM dataset, source field developers.openai.com)", url: "https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json", accessed: "2026-10-21"}
+    notes: >-
+      Recommended by one voice platform (Bolna) for lowest TTFT among current OpenAI models.
+      Price not verified on an OpenAI page in this session.
+
+  - id: openai/gpt-5-mini
+    kind: llm
+    prices:
+      input: 0.25
+      cached_input: 0.025
+      output: 2.00
+    confidence: medium
+    sources:
+      - {title: "OpenAI API pricing (via LiteLLM dataset)", url: "https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json", accessed: "2026-10-21"}
+    notes: "Reasoning model; older generation, kept for comparison."
+
+  - id: openai/gpt-5-nano
+    kind: llm
+    prices:
+      input: 0.05
+      cached_input: 0.005
+      output: 0.40
+    confidence: medium
+    sources:
+      - {title: "OpenAI API pricing (via LiteLLM dataset)", url: "https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json", accessed: "2026-10-21"}
+    notes: "Reasoning model; cheapest OpenAI text option, but tool-use quality for multi-step booking is untested here."
+
+  # ---------------------------------------------------------------- infrastructure
+  - id: livekit/cloud-agent-session
+    kind: infra
+    prices:
+      per_minute: 0.01
+    confidence: medium
+    sources:
+      - {title: "LiveKit pricing", url: "https://livekit.com/pricing", accessed: "2026-10-21"}
+      - {title: "LiveKit - Introducing per-second metering", url: "https://livekit.com/blog/introducing-per-second-metering-for-livekit", accessed: "2026-10-21"}
+      - {title: "LiveKit docs - Cloud billing", url: "https://docs.livekit.io/deploy/admin/billing/", accessed: "2026-10-21"}
+    notes: >-
+      Overage rate. Included minutes: Build (free) 1,000, Ship ($50/mo) 5,000, Scale ($500/mo)
+      50,000. Since Aug 2026, metered per second with a 10 s minimum, while the agent is
+      connected to the room. Applies to both architectures equally. Self-hosted agents pay no
+      LiveKit session fee (see livekit/self-hosted-agent). The adaptive interruption model is
+      unlimited on Cloud but usage-limited when self-hosted.
+
+  - id: livekit/self-hosted-agent
+    kind: infra
+    prices:
+      per_minute: 0.0
+    confidence: high
+    sources:
+      - {title: "LiveKit Agents (Apache-2.0)", url: "https://github.com/livekit/agents", accessed: "2026-10-21"}
+    notes: >-
+      Framework is Apache-2.0; you pay your own compute plus a LiveKit server (self-hosted or
+      Cloud WebRTC minutes). Self-hosted defaults (from LiveKit 1.8.8 source): adaptive
+      interruption is off in production unless requested, and TurnDetector() falls back to the
+      local turn-detector-v1-mini model; cloud v1 has a monthly request cap when self-hosted.
+
+  # ---------------------------------------------------------------- telephony
+  - id: livekit/sip
+    kind: telephony
+    prices:
+      per_minute: 0.004
+    confidence: medium
+    sources:
+      - {title: "LiveKit pricing (third-party SIP minutes)", url: "https://livekit.com/pricing", accessed: "2026-10-21"}
+    notes: >-
+      LiveKit charge for calls arriving over your own SIP trunk (Twilio/Telnyx), on top of the
+      carrier fee. Ship: 5,000 included, then $0.004/min. Scale: 50,000 included, then
+      $0.003/min. Build: 1,000 included. Metered per second, 10 s minimum. For LiveKit Phone
+      Numbers instead of a trunk, see livekit/phone-number-inbound-us.
+
+  - id: livekit/phone-number-inbound-us
+    kind: telephony
+    prices:
+      per_minute: 0.01
+    confidence: medium
+    sources:
+      - {title: "LiveKit pricing (LiveKit Phone Numbers)", url: "https://livekit.com/pricing", accessed: "2026-10-21"}
+      - {title: "LiveKit docs - Phone Numbers", url: "https://docs.livekit.io/telephony/start/phone-numbers/", accessed: "2026-10-21"}
+    notes: >-
+      US local inbound only. One free local number per project, then $1.00/mo. Build includes
+      50 inbound min, Ship 100, Scale 1,000. Toll-free: $0.02/min plus $2.00/mo, not on Build.
+      Replaces the carrier and third-party SIP lines, so don't add livekit/sip on top.
+
+  - id: twilio/elastic-sip-inbound-us
+    kind: telephony
+    prices:
+      per_minute: 0.0034
+    confidence: medium
+    sources:
+      - {title: "Twilio Elastic SIP Trunking pricing (US)", url: "https://www.twilio.com/en-us/sip-trunking/pricing/us", accessed: "2026-10-21"}
+    notes: >-
+      Origination (inbound) to a local number. Toll-free origination is $0.0130/min. Phone
+      numbers are billed separately (one cached page shows $1.15/mo for a local number).
+      Termination (outbound) to the lower 48 is listed at $0.0100/min, though another cached
+      copy shows lower zone rates. Add livekit/sip for the LiveKit side.
+
+  - id: telnyx/sip-inbound-us
+    kind: telephony
+    prices:
+      per_minute: 0.0032
+    confidence: medium
+    sources:
+      - {title: "Telnyx SIP trunking pricing", url: "https://telnyx.com/pricing/elastic-sip", accessed: "2026-10-21"}
+    notes: >-
+      "Starting at" local inbound, pay-as-you-go. An older Telnyx inbound page and a 2026
+      comparison article list $0.0035. Toll-free inbound starts at $0.015/min. Number rental
+      is extra. Add livekit/sip for the LiveKit side.
