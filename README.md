@@ -13,10 +13,7 @@ It runs on **two interchangeable architectures**, switchable per call:
 An evaluation harness compares the two on latency, cost, interruption handling and accuracy.
 
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/images/caller-dark.png">
-    <img src="docs/images/caller.png" alt="Caller page: pick speech-to-speech or pipeline and a language, then call; a Behind the scenes panel shows each step of a call in plain words" width="760">
-  </picture>
+  <img src="docs/images/demo.gif" alt="Demo call: a caller books a Saturday checkup over speech-to-speech while the Behind the scenes panel shows each step, including the knowledge-base search, the MCP slot lookup and booking, and the reply latency" width="760">
 </p>
 
 **[Read the trade-off analysis →](docs/comparison.md)** · [Architecture](docs/architecture.md) · [Plain-language write-up on Medium](https://medium.com/@smhassanraza1/i-built-one-ai-receptionist-two-ways-then-measured-both-e21aafb09fdd)
